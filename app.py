@@ -10,13 +10,12 @@ venv: online_course
 
 '''
 
-
-from flask import Flask, render_template
+from flask import Flask, render_template, abort, jsonify
 from books_data import BOOKS
 
 app = Flask(__name__)
 
-# Context processor to make books available globally in templates
+# Context processor for global access to books
 @app.context_processor
 def inject_books():
     return {'books': BOOKS}
@@ -28,14 +27,33 @@ def index():
 @app.route('/book/<book_id>')
 def book(book_id):
     book = BOOKS.get(book_id)
+    if not book:
+        abort(404)
     return render_template('book.html', book=book, book_id=book_id)
 
-@app.route('/book/<book_id>/chapter/<chapter_id>')
-def chapter(book_id, chapter_id):
+# API route to dynamically load chapter/subchapter content
+@app.route('/book/<book_id>/chapter/<chapter_id>/load')
+def load_chapter(book_id, chapter_id):
     book = BOOKS.get(book_id)
-    chapter = book['chapters'].get(chapter_id) if book else None
-    return render_template('book.html', book=book, chapter=chapter, book_id=book_id)
+    if not book:
+        abort(404)
+    chapter = book['chapters'].get(chapter_id)
+    if not chapter:
+        abort(404)
+    return render_template(chapter['template'])
+
+@app.route('/book/<book_id>/chapter/<chapter_id>/subchapter/<subchapter_id>/load')
+def load_subchapter(book_id, chapter_id, subchapter_id):
+    book = BOOKS.get(book_id)
+    if not book:
+        abort(404)
+    chapter = book['chapters'].get(chapter_id)
+    if not chapter:
+        abort(404)
+    subchapter = chapter['subchapters'].get(subchapter_id)
+    if not subchapter:
+        abort(404)
+    return render_template(subchapter['template'])
 
 if __name__ == '__main__':
     app.run(debug=True)
-

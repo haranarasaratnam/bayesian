@@ -1,15 +1,42 @@
-<!DOCTYPE html>
-<html lang="en">
+<!-- <header>
+    <nav>
+        {% for book_id, book in books.items() %}
+        <a href="{{ url_for('book', book_id=book_id) }}">{{ book.title }}</a>
+        {% endfor %}
+    </nav>
+</header> -->
+
+
+<!-- <!DOCTYPE html>
+<html lang="en"> -->
+
 <head>
+
+    {% block header %}
+
     <meta charset="UTF-8">
     <title>My Books</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style/style.css') }}">
+
+        <script type="math/tex">
+            \require{sansmath}
+    </script>
+
+    <script  type="text/javascript" id="MathJax-script"
+             async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+
+
+    {% endblock %}
+
 </head>
+
+
+
 <body>
     <header>
         <nav>
             {% for book_id, book in books.items() %}
-                <a href="{{ url_for('book', book_id=book_id) }}">{{ book.title }}</a>
+            <a href="{{ url_for('book', book_id=book_id) }}">{{ book.title }}</a>
             {% endfor %}
         </nav>
     </header>
@@ -17,10 +44,26 @@
         <aside>
             {% block sidebar %}{% endblock %}
         </aside>
+
         <main>
-            {% block content %}{% endblock %}
+            <!-- <header class="title">
+            </header> -->
+            {% block content %}
+            {% endblock %}
         </main>
+
     </div>
-    <script src="{{ url_for('static', filename='script.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/script.js') }}"></script>
+
+    <!-- <footer>
+        <div class="footer_wrapper">
+            <div class="footer_message">
+                <p> &copy; Haran Arasaratnam 2013 - 2024. Crafted with ❤️ and ☕ in California</p>
+            </div>
+
+        </div>
+    </footer> -->
+
 </body>
-</html>
+
+<!-- </html> -->

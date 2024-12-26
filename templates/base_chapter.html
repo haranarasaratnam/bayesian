@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    {% block header %}
+
+        <!-- Include Highlight.js stylesheet for styling -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.5.1/styles/default.min.css">
+
+    <!-- Include Highlight.js library -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.5.1/highlight.min.js"></script>
+    <script>hljs.highlightAll();</script>
+
+
+<!--    <script type="text/x-mathjax-config">-->
+<!--        MathJax.Hub.Config({-->
+<!--          "HTML-CSS": {-->
+<!--            scale: 95,-->
+<!--            availableFonts: ["TeX"],-->
+<!--            preferredFonts: "MathJax_Serif",-->
+<!--            undefinedFamily: "MathJax_Serif",-->
+<!--            linebreaks: { automatic: true },-->
+<!--            matchFontHeight: true,-->
+<!--            noReflows: false,-->
+<!--          },-->
+<!--          "fast-preview": {-->
+<!--            disabled: true-->
+<!--          },-->
+<!--        });-->
+
+<!--    </script>-->
+
+    <script type="math/tex">
+            \require{sansmath}
+    </script>
+
+    <script  type="text/javascript" id="MathJax-script"
+             async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+
+    {% endblock %}
+
+</head>
+
+<body>
+
+
+  <main>
+      {% block content %}
+      {% endblock %}
+
+  </main>
+
+  <footer>
+      <div class="footer_wrapper">
+          <div class="footer_message">
+              <p> &copy; Haran Arasaratnam 2013 - 2024. Crafted with ❤️ and ☕ in California</p>
+          </div>
+
+      </div>
+  </footer>
+
+</body>
+</html>

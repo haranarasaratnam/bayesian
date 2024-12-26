@@ -1,15 +1,38 @@
 {% extends "base.html" %}
+
 {% block sidebar %}
 <h3>{{ book.title }}</h3>
 <ul>
     {% for chapter_id, chapter in book.chapters.items() %}
-        <li>
-            <a href="{{ url_for('chapter', book_id=book_id, chapter_id=chapter_id) }}">{{ chapter.title }}</a>
-        </li>
+    <li>
+        <a href="javascript:void(0);"
+            onclick="loadContent('{{ url_for('load_chapter', book_id=book_id, chapter_id=chapter_id) }}')">
+            {{ chapter.title }}
+        </a>
+        {% if chapter.subchapters %}
+        <ul>
+            {% for subchapter_id, subchapter in chapter.subchapters.items() %}
+            <li>
+                <a href="javascript:void(0);"
+                    onclick="loadContent('{{ url_for('load_subchapter', book_id=book_id, chapter_id=chapter_id, subchapter_id=subchapter_id) }}')">
+                    {{ subchapter.title }}
+                </a>
+            </li>
+            {% endfor %}
+        </ul>
+        {% endif %}
+    </li>
     {% endfor %}
 </ul>
 {% endblock %}
+
 {% block content %}
-<h2>{{ chapter.title if chapter else 'Select a Chapter' }}</h2>
-<p>{{ chapter.content if chapter else '' }}</p>
+<div id="content-area">
+    <h2>Welcome to {{ book.title }}</h2>
+    <p>Select a chapter or section from the left sidebar.</p>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='script.js') }}"></script>
 {% endblock %}
