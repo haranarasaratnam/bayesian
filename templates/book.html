@@ -5,10 +5,11 @@
 <ul>
     {% for chapter_id, chapter in book.chapters.items() %}
     <li>
-        <a href="javascript:void(0);"
-            onclick="loadContent('{{ url_for('load_chapter', book_id=book_id, chapter_id=chapter_id) }}')">
-            {{ chapter.title }}
-        </a>
+        {{ chapter.title }}
+<!--        <a href="javascript:void(0);"-->
+<!--            onclick="loadContent('{{ url_for('load_chapter', book_id=book_id, chapter_id=chapter_id) }}')">-->
+<!--            {{ chapter.title }}-->
+<!--        </a>-->
         {% if chapter.subchapters %}
         <ul>
             {% for subchapter_id, subchapter in chapter.subchapters.items() %}

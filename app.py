@@ -40,7 +40,7 @@ def load_chapter(book_id, chapter_id):
     chapter = book['chapters'].get(chapter_id)
     if not chapter:
         abort(404)
-    return render_template(chapter['template'])
+    #return render_template(chapter['template'])
 
 @app.route('/book/<book_id>/chapter/<chapter_id>/subchapter/<subchapter_id>/load')
 def load_subchapter(book_id, chapter_id, subchapter_id):

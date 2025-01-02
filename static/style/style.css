@@ -1,34 +1,126 @@
-
-
-body {
-    font-family: Arial, sans-serif;
-    margin: 0;
+/* Default (Light Mode) */
+:root {
+    --background-color: #ffffff;
+    --text-color: rgb(51,51,51);
+    --header-bg: #f4f4f4;
+    --header-text: #000000;
+    --nav-link: #0000ff;
+    --aside-bg: #f4f4f4;
+    --main-bg: #ffffff;
 }
+
+/* Dark Mode */
+body.dark-mode {
+    --background-color: #121212;
+    --text-color: #ffffff;
+    --header-bg: #1f1f1f;
+    --header-text: #ffffff;
+    --nav-link: #4da3ff;
+    --aside-bg: #1e1e1e;
+    --main-bg: #1e1e1e;
+    --aside-nav-link: #ffffff; /* Red for TOC links in dark mode */
+}
+
+/* General Styles */
+body {
+    font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+    font-size: 16px;
+    margin: 0;
+    background-color: var(--background-color);
+    color: var(--text-color);
+}
+
+/* Header Styles */
 header {
-    background-color:#f4f4f4;
-    color: white;
+    background-color: var(--header-bg);
+    color: var(--header-text);
     padding: 10px;
     text-align: center;
 }
+
 header nav a {
-    color: #0000ff;
+    color: var(--nav-link);
     margin: 0 10px;
     text-decoration: none;
     font-size: 1.17em;
-    font-weight:bold;
+    font-weight: bold;
 }
+
+/* Container Layout */
 .container {
     display: flex;
     height: calc(100vh - 50px);
 }
+
+/* Sidebar (Table of Contents) */
 aside {
     width: 20%;
-    background-color: #f4f4f4;
+    background-color: var(--aside-bg);
     padding: 10px;
     overflow-y: auto;
+    border-right: 1px solid #ccc;
 }
+
+/* Sidebar (Table of Contents) Links */
+aside nav a {
+    color: var(--nav-link); /* Default color for light mode */
+    text-decoration: none;
+    display: block;
+    padding: 5px 0;
+}
+
+body.dark-mode aside nav a {
+    color: var(--aside-nav-link); /* Red in dark mode */
+}
+
+aside nav a:hover {
+    text-decoration: underline;
+}
+
+/* Main Content */
 main {
     width: 80%;
+    background-color: var(--main-bg);
     padding: 20px;
     overflow-y: auto;
+}
+
+/* Toggle Button for Dark/Light Mode */
+.toggle-mode {
+    position: absolute;
+    top: 10px;
+    right: 20px;
+    cursor: pointer;
+    font-size: 1rem;
+    background: var(--header-bg);
+    color: var(--header-text);
+    border: 1px solid var(--text-color);
+    padding: 5px 10px;
+    border-radius: 5px;
+}
+
+
+/* Footer Styles */
+footer {
+    background-color: var(--header-bg);
+    color: var(--header-text);
+    text-align: center; /* Center align the text */
+    padding: 10px 0;
+    position: fixed; /* Keeps footer at the bottom */
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    z-index: 1000; /* Ensures footer is above other content */
+}
+
+.footer_wrapper {
+    display: flex;
+    justify-content: center; /* Horizontally centers content */
+    align-items: center; /* Vertically aligns content if needed */
+    width: 100%;
+}
+
+.footer_message p {
+    margin: 0; /* Removes default margin */
+    font-size: 0.9em;
 }

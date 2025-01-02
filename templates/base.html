@@ -7,10 +7,37 @@
 </header> -->
 
 
-<!-- <!DOCTYPE html>
-<html lang="en"> -->
+<!DOCTYPE html>
+<html lang="en">
 
 <head>
+
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/fonts.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/social.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/footer.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+
+
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/portfolio.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/resume.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/contact.css') }}">
+
+
+        <script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const savedTheme = localStorage.getItem('theme');
+        if (savedTheme === 'dark') {
+            document.body.classList.add('dark-mode');
+        }
+    });
+
+    function toggleMode() {
+        document.body.classList.toggle('dark-mode');
+        const isDarkMode = document.body.classList.contains('dark-mode');
+        localStorage.setItem('theme', isDarkMode ? 'dark' : 'light');
+    }
+</script>
 
     {% block header %}
 
@@ -39,7 +66,14 @@
             <a href="{{ url_for('book', book_id=book_id) }}">{{ book.title }}</a>
             {% endfor %}
         </nav>
+
+
+     <button class="toggle-mode" onclick="toggleMode()">🌗 Toggle Mode</button>
+
+
     </header>
+
+
     <div class="container">
         <aside>
             {% block sidebar %}{% endblock %}
@@ -55,15 +89,19 @@
     </div>
     <script src="{{ url_for('static', filename='js/script.js') }}"></script>
 
-    <!-- <footer>
+
+
+
+
+    <footer>
         <div class="footer_wrapper">
             <div class="footer_message">
                 <p> &copy; Haran Arasaratnam 2013 - 2024. Crafted with ❤️ and ☕ in California</p>
             </div>
 
         </div>
-    </footer> -->
+    </footer>
 
 </body>
 
-<!-- </html> -->
+</html>
