@@ -1,1 +1,315 @@
 {% extends "base_chapter.html" %}
+
+{% block content %}
+
+   <!-- Slide 1 -->
+    <section class="left-align">
+
+        <h2>Introduction</h2>
+
+
+        <ul>
+            <li>In order to preserve the covariance matrix properties such as symmetry and positive semi-definiteness,
+                square-root filters
+                propagate the
+                square-roots of the covariance matrices. </li>
+
+            <li>At the heart of the square-root filters lies various matrix factorizations.
+                Given a positive definite covariance matrix of \(\mathbf{A}\in R^{n\times n}\), we can apply the
+                Cholesky
+                decomposition
+                to write
+                \[
+                \mathbf{A} = \mathbf{L}\mathbf{L}^{T}
+                \]
+                where \(\mathbf{L}\) is a lower triangular matrix.
+
+            <li>For a rectangular matrix of \(\mathbf{A}\in R^{m\times n}\), we can apply the QR decomposition to
+                write
+            \[
+            \mathbf{A} = \mathbf{Q}\mathbf{R}
+            \]
+                where \(\mathbf{Q}\in R^{m\times n}\) is an orthogonal (unitary) matrix
+                (\(\mathbf{Q}\mathbf{Q}^{T}=\mathbf{I}\))
+                and \(\mathbf{R}\in R^{n\times n}\)
+                is an upper triangular (sparse) matrix.
+            </li>
+            <li>We use the term "Tria" below to denote the QR decomposition that returns an (upper-)triangular matrix
+                \(\mathbf{R}\) of
+                \(\mathbf{A} = \mathbf{QR}\).</li>
+
+        </ul>
+        <p style="text-align: right;">Page 1</p>
+        <hr class="full-width">
+    </section>
+
+
+
+    <!-- Slide 2 -->
+    <section class="left-align">
+
+        <h2>SCKF Derivation</h2>
+
+        <li>
+            Obtaining the predicted state error covariance in a square root form is straightforward as shown in page
+            4.
+
+        </li>
+
+        <li>
+            For the
+            measurement update however, we rewrite the following covariances in the form of squared-matrices:
+            \[
+            \begin{align}
+            \mathbf{P}_{k|k-1} &= X_{k|k-1}X^{T}_{k|k-1}\\
+            \mathbf{P}_{zz,k|k-1} &= Z_{k|k-1}Z^{T}_{k|k-1} + \mathbf{S}_{R, k+1}\mathbf{S}^{T}_{R, k+1}\\
+            \mathbf{P}_{xz, k|k-1} &= X_{k|k-1}Z^{T}_{k|k-1}
+            \end{align}
+            \]
+
+            where the weighted mean-subtracted matrices are given by
+            \[
+            \begin{align}
+            X_{k|k-1} &= \frac{1}{\sqrt{m}}[X^{\ast}_{1, k|k-1} - \hat{\mathbf{x}}_{k|k-1}, X^{\ast}_{2, k|k-1} -
+            \hat{\mathbf{x}}_{k|k-1}
+            \ldots X^{\ast}_{m, k|k-1} - \hat{\mathbf{x}}_{k|k-1}]\\
+            Z_{k|k-1} &= \frac{1}{\sqrt{m}}[Z^{\ast}_{1, k|k-1} - \hat{\mathbf{z}}_{k|k-1}, Z^{\ast}_{2, k|k-1} -
+            \hat{\mathbf{z}}_{k|k-1}
+            \ldots Z^{\ast}_{m, k|k-1} - \hat{\mathbf{z}}_{k|k-1}]
+            \end{align}
+
+            \]
+
+        </li>
+
+
+        </ul>
+        <p style="text-align: right;">Page 2</p>
+        <hr class="full-width">
+    </section>
+
+
+
+    <!-- Slide 2 -->
+    <section class="left-align">
+
+        <h2>SCKF Derivation (Continued)</h2>
+
+
+        <ul>
+            <li>We combine the above 3 equations and write it in a squared-matrix form as shown by
+                \[
+                \begin{bmatrix}
+                \mathbf{P}_{zz, k|k-1} & \mathbf{P}_{zx, k|k-1}\\
+                \mathbf{P}_{xz, k|k-1} & \mathbf{P}_{k|k-1}
+                \end{bmatrix}
+
+                =
+                \begin{pmatrix}
+                Z_{k|k-1} & \mathbf{S}_{R,k}\\
+                X_{k|k-1} & \mathbf{O}
+                \end{pmatrix}
+
+                \begin{pmatrix}
+                Z_{k|k-1} & \mathbf{S}_{R,k}\\
+                X_{k|k-1} & \mathbf{O}
+                \end{pmatrix}^{T}
+
+
+
+                \]
+                where \(\mathbf{O}\in R^{n\times d}\) is the zero matrix.
+            </li>
+
+            <li>Applying the QR decomposition to
+                the transpose on the RHS above, we write
+                \[
+                \begin{align}
+                \begin{bmatrix}
+                \mathbf{P}_{zz, k|k-1} & \mathbf{P}_{zx, k|k-1}\\
+                \mathbf{P}_{xz, k|k-1} & \mathbf{P}_{k|k-1}
+                \end{bmatrix}
+                &= \mathbf{R}^{T}\mathbf{Q}^{T}\mathbf{QR} \\
+                &= \mathbf{R}^{T}\mathbf{R}\\
+                &=
+                \begin{pmatrix}
+                \mathbf{T}_{11} & \mathbf{O}\\
+                \mathbf{T}_{21} & \mathbf{T}_{22}
+                \end{pmatrix}
+                \begin{pmatrix}
+                \mathbf{T}_{11} & \mathbf{O}\\
+                \mathbf{T}_{21} & \mathbf{T}_{22}
+                \end{pmatrix}^{T}\\
+                &=
+                \begin{bmatrix}
+                \mathbf{T}_{11}\mathbf{T}_{11}^{T} & \mathbf{T}_{11}\mathbf{T}_{21}^{T}\\
+                \mathbf{T}_{21}\mathbf{T}_{11}^{T} &
+                \mathbf{T}_{21}\mathbf{T}_{21}^{T}+\mathbf{T}_{22}\mathbf{T}_{22}^{T}
+                \end{bmatrix}
+                \end{align}
+
+
+                \]
+
+                where the auxiliary matrices \(\mathbf{T}_{11}\in R^{d\times d}\) and \(\mathbf{T}_{22} \in R^{n\times
+                n}\) are low-triangular
+                square matrices and \(\mathbf{T}_{21} \in R^{n \times d}\) is a sparse rectangular matrix.
+
+            </li>
+
+            <li>
+                Hence, the cubature Kalman gain can be written as
+                \[
+                \begin{align}
+                W_{k} &= \mathbf{P}_{xz, k|k-1}\mathbf{P}^{-1}_{zz, k|k-1}\\
+                &=\mathbf{T}_{21}\mathbf{T}_{11}^{T}(\mathbf{T}_{21}\mathbf{T}_{11}^{T})^{-1}\\
+                &=\mathbf{T}_{21}\mathbf{T}_{11}^{-1}
+                \end{align}
+                \]
+
+                Since \(\mathbf{T}_{11}\) is a sparse lower-triangular matrix, we may efficiently compute
+                its inverse to compute the cubature Kalman gain \(W_{k}\) above.
+            </li>
+
+            <li>Since \(
+                \mathbf{P}_{k|k} = \mathbf{P}_{k|k-1} - W_{k}P_{zz,k|k-1}W^{T}_{k}\), by the same token, we may write
+                \(\mathbf{P}_{k|k} = \mathbf{T}_{22}\mathbf{T}_{22}^{T}
+                \). Hence, we write a square-root factor of the posterior error covariance matrix
+
+                \[
+                \mathbf{S}_{k|k} = \mathbf{T}_{22}
+
+                \]
+
+            </li>
+
+
+        </ul>
+        <p style="text-align: right;">Page 3</p>
+        <hr class="full-width">
+    </section>
+
+
+
+
+
+    <!-- Slide 3 -->
+    <section class="left-align">
+
+        <h2>SCKF: Time-Update</h2>
+        <ul>
+            <li>Assume at time \(k\) that the posterior density,
+                \[
+                p(\mathbf{x}_{k-1}|D_{k-1}) = \mathcal{N}(\hat{\mathbf{x}}_{k-1|k-1}, S_{k-1|k-1}S_{k-1|k-1}^{T})
+                \]
+                is known. Evaluate the cubature points: (\(i=1, 2,\ldots m, \text{ where } m=2n_{x}\))
+
+                \[
+                X_{i, k-1|k-1} = S_{k-1|k-1}\xi_{i} + \hat{\mathbf{x}}_{k-1|k-1}
+                \]
+            </li>
+
+            <li>Evaluate the propagated cubature points \((i=1,2,\ldots m)\):
+                \[
+                X^{\ast}_{i, k|k-1} = \mathbf{f}(X_{i,k-1|k-1}, \mathbf{u}_{k})
+                \]
+            </li>
+
+            <li>
+                Estimate the predicted state
+                \[
+                \hat{\mathbf{x}}_{k|k-1} = \frac{1}{m}\sum_{i=1}^{m}X^{\ast}_{i, k|k-1}
+                \]
+            </li>
+
+            <li>
+                Estimate the square-root of the predicted error covariance as follows:
+                \[
+
+                \mathbf{R} = \text{Tria}([X_{k|k-1}, S_{Q,k-1}]^{T}) => \mathbf{S}_{k|k-1} = \mathbf{R}^{T}
+
+
+
+                <!--                \frac{1}{m}\sum_{i=1}^{m}X^{\ast}_{i, k|k-1}X^{\ast T}_{i, k|k-1} - -->
+                <!--                \hat{\mathbf{x}}_{k|k-1}\hat{\mathbf{x}}^{T}_{k|k-1} + \mathbf{Q}_{k-1}-->
+                \]
+                where \(S_{Q,k-1}\) is a square-root of \(\mathbf{Q}_{k-1}\).
+            </li>
+
+        </ul>
+
+        <p style="text-align: right;">Page 4</p>
+        <hr class="full-width">
+    </section>
+
+
+    <!-- Slide 2 -->
+    <section class="left-align">
+        <h2>SCKF: Measurement Update</h2>
+        <ul>
+            <li>Given that \(\mathbf{P}_{k|k-1} = S_{k|k-1}S_{k|k-1}^{T}\),
+                evaluate the cubature points: (\(i=1, 2,\ldots m, \text{ where } m=2n_{x}\))
+                \[
+                X_{i, k|k-1} = S_{k|k-1}\xi_{i} + \hat{\mathbf{x}}_{k|k-1}
+                \]
+            </li>
+
+            <li>Evaluate the propagated cubature points \((i=1,2,\ldots m)\):
+                \[
+                Z^{\ast}_{i, k|k-1} = \mathbf{h}(X_{i,k|k-1}, \mathbf{u}_{k})
+                \]
+            </li>
+
+            <li>
+                Estimate the predicted measurement
+                \[
+                \hat{\mathbf{z}}_{k|k-1} = \frac{1}{m}\sum_{i=1}^{m}Z^{\ast}_{i, k|k-1}
+                \]
+            </li>
+
+            <li>Compute the auxiliary matrices \(\mathbf{T}_{11}, \mathbf{T}_{22} \text{ and } \mathbf{T}_{21}\) using
+                the
+                QR decomposition algorithm:
+                \[
+                \text{Tria}\begin{pmatrix}
+                Z_{k|k-1} & \mathbf{S}_{R,k}\\
+                X_{k|k-1} & \mathbf{O}
+                \end{pmatrix}^{T} =
+                \begin{pmatrix}
+                \mathbf{T}_{11} & \mathbf{O}\\
+                \mathbf{T}_{21} & \mathbf{T}_{22}
+                \end{pmatrix}^{T}
+                \]
+
+
+            </li>
+
+            <li>
+                Estimate the cubature Kalman filter gain
+                \[
+                W_{k} = \mathbf{T}_{21}/\mathbf{T}_{11}
+                \]
+            </li>
+
+            <li>
+                Estimate the updated state
+                \[
+                \hat{\mathbf{x}}_{k|k} = \hat{\mathbf{x}}_{k|k-1} + W_{k}(\mathbf{z}_{k} - \hat{\mathbf{z}}_{k|k-1})
+                \]
+            </li>
+
+
+            <li>
+                The square-root of the corresponding error covariance matrix
+                \[
+                \mathbf{S}_{k|k} = \mathbf{T}_{22}
+                \]
+
+            </li>
+
+        </ul>
+        <p style="text-align: right;">Page 5</p>
+        <hr class="full-width">
+    </section>
+
+{% endblock %}

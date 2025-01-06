@@ -1,1 +1,65 @@
 {% extends "base_chapter.html" %}
+
+{% block content %}
+
+    <div class="content">
+        <h1>Section 2.2: Performance under Ideal Modelling Conditions</h1>
+        <p>We first consider the performance of the Kalman filter under ideal modelling conditions, meaning
+        that the system model is known precisely as are the process and noise models.</p>
+        <p>Figure 6 shows the position track achieved by applying the Kalman filter. Figure 6a shows the
+        predicted and estimated positions together with the measurements for the complete track. A close-
+        up of the initial track is shown in Figure 6b. The key thing to note here is that the updated estimate
+        \( \hat{x}_{k+1|k+1} \) always lies between the prediction \( \hat{x}_{k+1|k} \) and the measurement \( z_{k+1} \).
+        This follows from the fact that the update is a weighted sum of the prediction and the measurement.</p>
+        <p>Figure 6c shows a close-up of the estimator when it is in the steady-state. In this case, the weights
+        (i.e., the Kalman gain) used in the update are approximately constant.</p>
+        <p>Figure 7 shows the velocity track achieved by applying the Kalman filter. No measurement is made
+        of the velocity state, so estimates are produced via the cross-correlation between the velocity and
+        position (i.e., through \( P \)).</p>
+
+        <h3>Steady-State Performance</h3>
+        <p>Figure 8 shows the predicted and estimated error covariances for position and velocity. In particular,
+        note that they tend to constant values as \( k \) gets large.</p>
+        <p>Performance in the steady-state turns out to be dependent on the values chosen for the process and
+        measurement noise covariance matrices, \( Q \) and \( R \).</p>
+        <p>Given that:</p>
+        <p>\[ P_{k+1|k} = F_k P_{k|k} F_k^T + Q_k \]</p>
+        <p>and:</p>
+        <p>\[ P_{k|k} = P_{k|k-1} - P_{k|k-1} H_k^T (H_k P_{k|k-1} H_k^T + R_k)^{-1} H_k P_{k|k-1} \]</p>
+        <p>We have:</p>
+        <p>\[ P_{k+1|k} = F_k [P_{k|k-1} - P_{k|k-1} H_k^T (H_k P_{k|k-1} H_k^T + R_k)^{-1} H_k P_{k|k-1}] F_k^T + Q_k \]</p>
+
+        <h1>Section 2.3: Model Validation</h1>
+        <p>So far, we have only considered the performance of a Kalman filter when both the system model and
+        noise processes are known precisely. A Kalman filter may not perform correctly if there is either
+        modelling or noise estimation error, or both.</p>
+        <p>Here, we discuss the causes and identify most of the important techniques used to control a Kalman
+        filter from diverging. We consider two types of error and their characteristics:</p>
+        <ul>
+            <li>Error in the process and observation noise specification.</li>
+            <li>Error in the modelling of system dynamics (process model).</li>
+        </ul>
+        <p>The three tests that we introduced in the last section will be used as a basis for trying to tell when
+        something has gone wrong with the filter.</p>
+
+        <h3>Detecting Process and Observation Noise Errors</h3>
+        <p>The example used in the previous section will be used to illustrate general characteristics observed
+        when the process and observation noise are under- and over-estimated.</p>
+        <p>Matlab code is often used to simulate these scenarios and test performance under varying noise
+        specifications. For example:</p>
+        <pre>
+        N = 100;
+        delT = 1;
+        F = [1 delT; 0 1];
+        H = [1 0];
+        sigma2Q = 0.01;
+        sigma2R = 0.1;
+        Q = sigma2Q * [delT^3/3 delT^2/2; delT^2/2 delT];
+        P = 10*Q;
+        R = sigma2R * [1];
+        </pre>
+        <p>By comparing predictions and measurements, we can validate the correctness of noise assumptions
+        and adjust them accordingly.</p>
+    </div>
+
+{% endblock %}

@@ -7,7 +7,7 @@ BOOKS = {
                 # 'template': 'books/book1/ch1.html',
                 'subchapters': {
                     'ch1_1': {
-                        'title': '1.1: Bayes Rule',
+                        'title': '1.1: Probabilty and Bayes\' Rule',
                         'template': 'books/book1/ch1_1.html'
                     },
                     'ch1_2': {
@@ -15,7 +15,7 @@ BOOKS = {
                         'template': 'books/book1/ch1_2.html'
                     },
                     'ch1_3': {
-                        'title': '1.3: Estimating State of DC Motor',
+                        'title': '1.3: Use Case 1: Estimation  with DC Motor',
                         'template': 'books/book1/ch1_3.html'
                     },
                 }
@@ -40,6 +40,14 @@ BOOKS = {
                         'title': '2.4: Cubature Kalman Filters',
                         'template': 'books/book1/ch2_4.html'
                     },
+                    'ch2_5': {
+                        'title': '2.5: Use Case 1: Radar Tracking',
+                        'template': 'books/book1/ch2_5.html'
+                    },
+                    'ch2_6': {
+                        'title': '2.6: Use Case 2: Mobile Robot Navigation',
+                        'template': 'books/book1/ch2_6.html'
+                    },
                 }
             },
 
@@ -50,6 +58,10 @@ BOOKS = {
                     'ch3_1': {
                         'title': '3.1: Particle Filters',
                         'template': 'books/book1/ch3_1.html'
+                    },
+                    'ch3_2': {
+                        'title': '3.2: Use Case 1: SLAM',
+                        'template': 'books/book1/ch3_2.html'
                     },
                 }
             },
@@ -63,7 +75,7 @@ BOOKS = {
                         'template': 'books/book1/ch4_1.html'
                     },
                     'ch4_2': {
-                        'title': '4.2: Continuous-Discrete Bayesian Filters',
+                        'title': '4.2: Information Filters',
                         'template': 'books/book1/ch4_2.html'
                     },
                     'ch4_3': {
@@ -71,24 +83,29 @@ BOOKS = {
                         'template': 'books/book1/ch4_3.html'
                     },
                     'ch4_4': {
-                        'title': '4.4: Interacting Multiple Model (IMM) Filters',
+                        'title': '4.4: Continuous-Discrete Filters',
                         'template': 'books/book1/ch4_4.html'
                     },
                 }
             },
 
             'ch5': {
-                'title': 'Chapter 5: Applicationss',
+                'title': 'Chapter 5: Practical Considerations',
                 # 'template': 'books/book1/ch2_1.html'
                 'subchapters': {
                     'ch5_1': {
-                        'title': '5.1:  Radar Tracking (Accompanied by Python and Matlab Code)',
+                        'title': '5.1: Estimation under unknown model and noise statistics',
                         'template': 'books/book1/ch5_1.html'
                     },
                     'ch5_2': {
-                        'title': '5.2: Mobile Robot Navigation',
+                        'title': '5.2: Filter Initialization',
                         'template': 'books/book1/ch5_2.html'
-                    }
+                    },
+                    'ch5_3': {
+                        'title': '5.3: Combining Multiple Models Using IMM Filter',
+                        'template': 'books/book1/ch5_3.html'
+                    },
+                },
             },
 
             'ch6': {
@@ -96,13 +113,12 @@ BOOKS = {
                 # 'template': 'books/book1/ch2_1.html'
                 'subchapters': {
                     'ch6_1': {
-                        'title': '6.1: Regerences',
+                        'title': '6.1: References',
                         'template': 'books/book1/ch6_1.html'
-                        },
-                    }
-                }
-            }
-        }
+                    },
+                },
+            },
+        }, #chaps
     },
 
     'book2': {

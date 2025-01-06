@@ -1,128 +1,131 @@
 {% extends "base_chapter.html" %}
 
 {% block content %}
-    <section class="left-align">
 
-        <h2>Introduction</h2>
-        <p>
-            <img src="{{ url_for('static', filename='images/dssm.png') }}"
-                style="width: 60%; height: auto; display: block; margin: 0 auto;">
-        </p>
+<h2>Conditional Probability</h2>
 
-        <ul>
-            <li>The dynamic state-space model in discrete-time can be written as a set of nonlinear system of equations:
-                \[
-                \begin{align}
-                \text{Process equation: } \mathbf{x}_{k} &= \mathbf{f}(\mathbf{x}_{k-1}, \mathbf{u}_{k}, \mathbf{v}_{k})
-                \\
-                \text{Measurement equation: } \mathbf{z}_{k} &= \mathbf{h}(\mathbf{x}_{k}, \mathbf{w}_{k})
-                \end{align}
-                \]
-                where \(\mathbf{x}_{k}\in R^{n}\) is the state vector at time k, \(\mathbf{u}_{k}\in R^{p}\) is the
-                control input at time
-                k,
-                \(\mathbf{z}_{k}\in R^{d}\) is the measurement taken at time k, \(\mathbf{v}_{k}\) is the process noise and
-            \(\mathbf{w}_{k}\) is the measurement noise</li>
-            <li>The Bayeisna filter theory attempts to address the question of how we could recursively estimate the  hidden state
-                of the system \(\mathbf{x}_{k}\),
-                given the noisy measurements and inputs upto time \(k\),
-                \(D_{k}=\{\mathbf{z}_{1},\mathbf{z}_{2}\ldots\mathbf{z}_{k},\mathbf{u}_{1},\mathbf{u}_{2}\ldots\mathbf{u}_{k}\}\)? </li>
+Conditional probability describes the probability of an event occurring, given that another event has already occurred. It is denoted as \( P(A | B) \), which means "the probability of event \( A \) given that event \( B \) has occurred."
 
-        </ul>
-        <p style="text-align: right;">Page 1</p>
-        <hr class="full-width">
-    </section>
+The formula for conditional probability is:
 
-    <!-- Slide 2 -->
-    <section class="left-align">
-        <h2>Conceptual (Recursive) Solution</h2>
-        <ul>
+\[
+P(A | B) = \frac{P(A \cap B)}{P(B)}
+\]
 
-            <li>Time Update:
-                \[
-                p(\mathbf{x}_{k}|D_{k-1}, \mathbf{u}_{k}) =
-                \int_{R^{n_{x}}}p(\mathbf{x}_{k-1}|D_{k-1})p(\mathbf{x}_{k}|\mathbf{x}_{k-1}, \mathbf{u}_{k})d\mathbf{x}_{k-1}
-                \]
+Where:
+- \( P(A | B) \) is the probability of \( A \) happening given that \( B \) has already happened.
+- \( P(A \cap B) \) is the probability of both \( A \) and \( B \) happening together (the intersection).
+- \( P(B) \) is the probability of \( B \) happening (the marginal probability of \( B \)).
+
+<h3>Example of Conditional Probability</h3>>
+Suppose there is a deck of 52 playing cards, and you draw a card. If we know that the card drawn is a **king**, then the probability that it is the **king of hearts** (event \( A \)) given that it is a king (event \( B \)) is:
+
+\[
+P(\text{King of Hearts} | \text{King}) = \frac{P(\text{King of Hearts})}{P(\text{King})} = \frac{1/52}{4/52} = \frac{1}{4}
+\]
+
+This means that if you already know the card is a king, the probability of it being the king of hearts is 1/4.
 
 
-            </li>
-            <li>Measurement Update (Using Bayes' Rule):
-                \[
-                p(\mathbf{x}_{k}|D_{k}) =\frac{1}{c_{k}}
-                p(\mathbf{x}_{k}|D_{k-1}, \mathbf{u}_{k})p(\mathbf{z}_{k}|\mathbf{x}_{k}, \mathbf{u}_{k})
-                \]
-                where the normalizing constant
-                \[
-                \begin{align}
-                c_{k} &=p(\mathbf{x}_{k}|D_{k-1}, \mathbf{u}_{k})\\
-                &=\int_{R^{n_{x}}}p(\mathbf{x}_{k}|D_{k-1}, \mathbf{u}_{k})p(\mathbf{z}_{k}|\mathbf{x}_{k}, \mathbf{u}_{k})d\mathbf{x}_{k}
-                \end{align}
-                \]
-                and \(n_{x}\) is the state vector dimension.
-            </li>
+<h2>Bayes' Theorem</h2>
 
-            <li> The integrals above are typically intractable for nonlinear systems. </li>
-        </ul>
-        <p style="text-align: right;">Page 2</p>
-        <hr class="full-width">
-    </section>
+Bayes' Theorem describes the relationship between **conditional probabilities** and can be simply derived
+from the conditional probabity. It allows us to reverse the conditioning in a conditional probability statement, by relating the probability of an event given some data (posterior) to the prior probability of the event and the likelihood of the data.
+
+The general form of **Bayes' Theorem** is:
+
+\[
+P(A | B) = \frac{P(B | A) P(A)}{P(B)}
+\]
+
+Where:
+- \( P(A | B) \) is the **posterior** probability, i.e., the probability of event \( A \) occurring given that event \( B \) has occurred.
+- \( P(B | A) \) is the **likelihood**, i.e., the probability of observing event \( B \) given that \( A \) is true.
+- \( P(A) \) is the **prior** probability, i.e., the initial belief about event \( A \).
+- \( P(B) \) is the **marginal likelihood** (or evidence), i.e., the probability of observing event \( B \), integrated over all possible values of \( A \).
+
+<h3>Example of Bayes' Theorem</h3>
+Let’s say we have a medical test for a disease, and we want to find out the probability that a patient has the disease given a positive test result. We know:
+- The probability of the disease (\( P(\text{Disease}) \)) is 1% (prior).
+- The probability of a positive test given the disease (\( P(\text{Positive} | \text{Disease}) \)) is 90% (likelihood).
+- The probability of a positive test regardless of the disease (\( P(\text{Positive}) \)) is 10%.
+
+Bayes' Theorem allows us to update the probability of the disease given the test result:
+
+\[
+P(\text{Disease} | \text{Positive}) = \frac{P(\text{Positive} | \text{Disease}) P(\text{Disease})}{P(\text{Positive})}
+\]
 
 
-    <!-- Slide 2 -->
-    <section class="left-align">
-        <h2>Approximate Solutions to Nonlinear Systems</h2>
+### Relationship Between Bayes' Theorem and Conditional Probability:
+Bayes' Theorem is essentially a formula for reversing conditional probabilities. It allows you to calculate the probability of an event given some evidence, using prior knowledge about the probability of the evidence and the relationship between the event and the evidence.
 
+In short:
+- **Conditional probability**: \( P(A | B) \) quantifies how the probability of \( A \) changes when we know \( B \) has occurred.
+- **Bayes' Theorem**: Allows us to **reverse** this relationship and compute \( P(A | B) \) using the inverse relationship, where we know \( P(B | A) \), the prior \( P(A) \), and \( P(B) \).
 
+<h2>Intuition Behind Bayes' Theorem</h2>
+Bayes' Theorem helps us update our beliefs (or probabilities) as new data or evidence becomes available. It’s especially useful in situations where we have **prior knowledge** or **beliefs** about the probabilities, and we want to incorporate new evidence (e.g., in machine learning, medical testing, etc.).
+
+<h3>Example of Updating Beliefs</h3>
+Imagine you initially believe there's a 1% chance of rain tomorrow (prior probability \( P(\text{Rain}) = 0.01 \)). You then receive a weather forecast (likelihood), which tells you there's a 90% chance of rain if it’s cloudy (i.e., \( P(\text{Cloudy} | \text{Rain}) = 0.9 \)). You observe that it is cloudy today. Bayes' Theorem allows you to compute the updated probability that it will rain tomorrow given that it's cloudy today:
+
+\[
+P(\text{Rain} | \text{Cloudy}) = \frac{P(\text{Cloudy} | \text{Rain}) P(\text{Rain})}{P(\text{Cloudy})}
+\]
+
+<h2>Central Limit Theorem (CLT) and Normal Distribution</h2>
+
+<img src="{{ url_for('static', filename='images/central_limit_theorem.gif') }}"
+ style="width: 80%; height: auto; display: block; margin: 0 auto;">
+
+    <h1>Significance of the Central Limit Theorem (CLT)</h1>
+    <p>
+        The <strong>Central Limit Theorem (CLT)</strong> is one of the most important results in probability and statistics. It states that:
+    </p>
+    <blockquote>
+        <em>"The sum (or average) of a large number of independent, identically distributed (i.i.d) random variables, each with finite mean and variance, will tend to follow a Normal (Gaussian) distribution, regardless of the original distribution of the variables."</em>
+    </blockquote>
+
+    <h2>Key Significance:</h2>
+    <ol>
         <li>
-            Although we have the optimal solution (the celebrated Kalman filter) to the linear Gaussian systems, we
-            do not have an
-            optimal solution to nonlinear systems.
+            <strong>Universal Applicability:</strong> The CLT applies to any distribution with finite mean and variance, making it widely applicable across real-world problems.
         </li>
-
-        <li>In the literature, researchers in the past have taken two approaches to derive an approximate solution:
-            <ul>
-                <li>
-                    Kalman-like (Innovations based) algorithms:
-                    <ul>
-                        <li> Extended Kalman Filter (EKF) </li>
-                        <li> Unscented Kalman Filter (UKF)</li>
-                        <li> Central-Difference Kalman Filter (CDKF)</li>
-                        <li> Gauss-Hermite Quadrature Kalman Filter (GH-QKF)</li>
-                    </ul>
-                </li>
-                <li>
-                    Moment Closing algorithms:
-                    <ul>
-                        <li>Kushner's nonlinear filter</li>
-                        <li> Grid filters</li>
-                        <li> Particle Filters</li>
-                    </ul>
-                </li>
-            </ul>
+        <li>
+            <strong>Approximation:</strong> Many statistical methods rely on the assumption of normality. With a sufficiently large sample size, the CLT ensures this assumption is valid.
         </li>
-        <li>Although we have a suite of nonlnear Bayesian filters to address the nonlinear inference problems, each of them
-            suffers from either accuracy or increased computational cost or both.
+        <li>
+            <strong>Simplification:</strong> Complex probability distributions can be approximated using the simpler Gaussian model for large samples.
         </li>
-        <li>In the next section,  we introduce a new Bayesian nonlinear filter called
-            the Cubature Kalman
-            Filter (CKF). We will derive the CKF with a mathematical rigor and prove that it yields reasonably accurate estimates at a minimal cost.</li>
+    </ol>
 
-        </ul>
-        <p style="text-align: right;">Page 3</p>
-        <hr class="full-width">
-    </section>
+    <h2>Mathematical Formulation:</h2>
+    <p>
+        Suppose \( X_1, X_2, \dots, X_n \) are i.i.d random variables with mean \( \mu \) and variance \( \sigma^2 \). Define the sample mean as:
+    </p>
+    <div class="math">
+        \[
+        \bar{X} = \frac{1}{n} \sum_{i=1}^{n} X_i
+        \]
+    </div>
+    <p>
+        Then, as \( n \to \infty \), the distribution of the sample mean approaches a normal distribution:
+    </p>
+    <div class="math">
+        \[
+        \bar{X} \sim N\left(\mu, \frac{\sigma^2}{n}\right)
+        \]
+    </div>
 
+    <h2>Practical Example:</h2>
+    <p>
+        The CLT explains why the average height of a large group of people tends to form a bell-shaped curve (Gaussian distribution), even though individual heights might not be normally distributed.
+    </p>
 
+    <h2>Conclusion:</h2>
+    <p>
+        The Central Limit Theorem is a cornerstone of statistical inference, allowing us to make probabilistic predictions about sample means and sums, even when the original data does not follow a normal distribution.
+    </p>
 
-    <section class="left-align">
-
-        <h2>Bayesian filters in full-state feedback control systems </h2>
-        <p>
-            <img src="{{ url_for('static', filename='images/dssm_signal_flow.png') }}"
-                style="width: 100%; height: auto; display: block; margin: 0 auto;">
-        </p>
-
-        <p style="text-align: right;">Page 4</p>
-        <hr class="full-width">
-    </section>
 {% endblock %}

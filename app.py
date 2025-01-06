@@ -8,6 +8,8 @@
 
 venv: online_course
 
+git remote add origin https://github.com/haranarasaratnam/bayesian.git
+
 '''
 
 from flask import Flask, render_template, abort, jsonify

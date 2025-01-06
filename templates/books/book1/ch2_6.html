@@ -1,0 +1,250 @@
+{% extends "base_chapter.html" %}
+
+{% block content %}
+
+    <div class="content">
+        <h1>Section 4.5: Example - A Simple Robot Vehicle</h1>
+        <p>Consider the simplified description of a robot vehicle in motion illustrated in Figure 20. The state is described by:</p>
+        <p>\[ x_k = \begin{bmatrix} x_k \\ y_k \\ \theta_k \end{bmatrix} \]</p>
+        <p>Control is provided by an input control vector which determines the velocity of travel:</p>
+        <p>\[ u_k = \begin{bmatrix} V_k \\ \phi_k \end{bmatrix} \]</p>
+        <p>The motion of the vehicle can be described by the nonlinear state transition equation:</p>
+        <p>\[
+        \begin{bmatrix}
+        x_{k+1} \\
+        y_{k+1} \\
+        \theta_{k+1}
+        \end{bmatrix} =
+        \begin{bmatrix}
+        x_k + \Delta t V_k \cos(\theta_k + \phi_k) \\
+        y_k + \Delta t V_k \sin(\theta_k + \phi_k) \\
+        \theta_k + \frac{V_k}{B} \Delta t \sin(\phi_k)
+        \end{bmatrix} + q_k
+        \]</p>
+        <p>Here, \( \Delta t \) is the time interval between time steps, \( B \) is the wheel baseline, and \( q_k \) is the noise vector which combines errors in modeling the process and control.</p>
+        <p>We assume that measurements of range (depth) and bearing are made to a set of beacons at fixed locations:</p>
+        <p>\[ B_i = \begin{bmatrix} X_i \\ Y_i \end{bmatrix}, i = 1, \ldots, N \]</p>
+        <p>The nonlinear observation model is therefore:</p>
+        <p>\[
+        z_k = \begin{bmatrix}
+        r_k \\
+        \phi_k
+        \end{bmatrix} =
+        \begin{bmatrix}
+        \sqrt{(X - x_k)^2 + (Y - y_k)^2} \\
+        \arctan\left(\frac{Y - y_k}{X - x_k}\right) - \theta_k
+        \end{bmatrix} + r_k
+        \]</p>
+        <h2>Prediction</h2>
+        <p>The predicted state is given by:</p>
+        <p>\[
+        \begin{bmatrix}
+        \hat{x}_{k+1|k} \\
+        \hat{y}_{k+1|k} \\
+        \hat{\theta}_{k+1|k}
+        \end{bmatrix} =
+        \begin{bmatrix}
+        \hat{x}_{k|k} + \Delta t V_k \cos(\hat{\theta}_{k|k} + \phi_k) \\
+        \hat{y}_{k|k} + \Delta t V_k \sin(\hat{\theta}_{k|k} + \phi_k) \\
+        \hat{\theta}_{k|k} + \frac{V_k}{B} \Delta t \sin(\phi_k)
+        \end{bmatrix} + q_k
+        \]</p>
+        <p>The prediction covariance matrix is:</p>
+        <p>\[ P_{k+1|k} = \frac{\partial f}{\partial x} P_{k|k} \frac{\partial f}{\partial x}^T + Q_k \]</p>
+
+        <h1>Section 4.6: Measurement Validation - Coping with Non-Gaussian Noise</h1>
+        <p>Recall that in the first part of the course, we considered the problem of validating new measurements. Such considerations are particularly important in applications such as sonar tracking where measurement ‘outliers’ are common; i.e., the sensor distribution (conditioned on the true value) is no longer Gaussian.</p>
+        <p>The solution to this problem was to set up a validation gate or innovation gate; any measurement lying in the “region” of space defined by the gate is considered to be associated with the target. This region typically forms an N-dimensional ellipsoid.</p>
+        <p>The validation gate is defined as:</p>
+        <p>\[ R(\chi) = \left\{ z | (z_{k+1} - \hat{z}_{k+1|k})^T S^{-1}_{k+1} (z_{k+1} - \hat{z}_{k+1|k}) \leq \chi \right\} \]</p>
+        <p>where \( \chi \) is obtained from standard \( \chi^2 \) distribution tables.</p>
+        <p>This approach ensures that only valid measurements are considered in the update step.</p>
+    </div>
+
+  <h1>Mobile Robot Navigation</h1>
+
+
+    <!-- Slide 1 -->
+    <section class="left-align">
+
+        <h2>Scenario</h2>
+
+        <p>
+            <img src="{{ url_for('static', filename='images/bicycle_model.png') }}"
+                style="width: 60%; height: auto; display: block; margin: 0 auto;">
+        </p>
+        <ul>
+
+            <li>
+                We consider a mobile robot navigation problem where a car-like robot employs the SCKF to estimate its
+                own pose
+                based on
+                a set of
+                landmarks and on-board sensor measurements and apply its control inputs. This problem often arises in
+                SLAM (Simultaneous Localization
+                And Map Building).
+            </li>
+            <li>The robot’s pose (state vector), represented as \((x, y, \theta)\), is initialized using a less precise
+                map dataset, akin to GPS accuracy. </li>
+            <li>As the robot moves, we assume that the robot continuously adjusts its control inputs, namely, x
+                position, y position and
+                steering angle in its local coordinates. </li>
+            <li>An onboard radar sensor measures the range and bearing with respect to known landmarks, provided they
+                are within the
+                sensor’s detection range and field of view. </li>
+            <li>The SCKF is chosen as an onboard estimator for the following reasons: (1) Its improved estimation
+                accuracy
+                enables the robot to navigate even without measurements at times (2) Its efficient formulation is
+                expected
+                to meet strict time constraint without failures.
+
+
+            </li>
+
+
+
+        </ul>
+        <p style="text-align: right;">Page 1</p>
+        <hr class="full-width">
+    </section>
+
+
+
+
+
+    <!-- Slide 2 -->
+    <section class="left-align">
+
+        <h2>Bicycle Model</h2>
+
+
+        <ul>
+
+            <li>We write the dynamic state space model for the above scenario as follows:
+                <br>
+                Process Equation:
+                \[
+                \begin{bmatrix}
+                x_{k+1}\\
+                y_{k+1}\\
+                \theta_{k+1}
+                \end{bmatrix}
+                =
+                \begin{bmatrix}
+                x_{k}\\
+                y_{k}\\
+                \theta_{k}
+                \end{bmatrix}
+                +
+                \begin{bmatrix}
+                \cos\theta_{k} & -\sin\theta_{k} & 0\\
+                \sin\theta_{k} &\cos\theta_{k} & 0\\
+                0 & 0 & 1
+                \end{bmatrix}
+                \begin{bmatrix}
+                u_{1,k}\\
+                u_{2,k}\\
+                u_{3,k}
+                \end{bmatrix}
+
+                + \mathbf{v}_{k}
+
+                \]
+
+            </li>
+
+            <li>
+                Measurement Equation:
+                \[
+                \begin{bmatrix}
+                z_{1,k}\\
+                z_{2,k}
+                \end{bmatrix}
+                =
+                \begin{bmatrix}
+                \sqrt{(x_{k} - x_{\text{lmk},i})^{2}+(y_{k} - y_{\text{lmk},i})^{2}}\\
+                \tan^{-1}\big(\frac{y_{k} - y_{\text{lmk},i}}{x_{k} - x_{\text{lmk},i}}\big) - \theta_{k}
+                \end{bmatrix} + \mathbf{w}_{k}
+
+                \]
+
+            </li>
+
+
+        </ul>
+        <p style="text-align: right;">Page 2</p>
+        <hr class="full-width">
+    </section>
+
+
+    <!-- Slide 2 -->
+    <section class="left-align">
+
+        <h2>Experimental Settings</h2>
+
+
+        <ul>
+
+            <li>
+                The initial position of the robot was set to \([40m, 25m, 0^\circ]\) in the global co-ordinate.
+                We added
+                Gaussian noise characterized by a
+                mean of 0 and a standard deviation of \([0.01m, 0.01m, 1.5^\circ]\) for filter signal processing.
+            </li>
+            <li>
+                The radar was assumed to have a limited line of sight, detecting only landmarks within a range of 50m
+                and an angular field of view of 30 degrees.
+                This means there will be some sample times without any measurements. For these sample times the filter
+                generates state predictions using the state transition function.
+            </li>
+            <li>
+                The control input was set to be constant at \([0, 1, 3^\circ]\). As you can see from the
+                process equation above, at every time step, the robot took a step of 1m up in the y-direction with a
+                front wheel turning by \(3^{\circ}\) anti-clock wise
+                in its local coordinate creating an elliptical path as shown below.
+
+            </li>
+
+            <li> The trajectory was simulated for 120 seconds with a sampling rate of 1 hz.</li>
+
+            <li>
+                The on-board radar measurements were considered noisy, with Gaussian-distributed additive noise having a mean of
+                0 and a standard deviation of \([1.1m, 5^\circ]\).
+            </li>
+
+            <li>
+                We randomly placed 15 landmarks in the environment. Radar measurements in the local coordinate frame
+                were transformed into the global coordinate system in the x and y planes. The nearest neighbor technique
+                was then applied to identify the corresponding landmarks.
+            </li>
+        </ul>
+        <p style="text-align: right;">Page 3</p>
+        <hr class="full-width">
+    </section>
+
+
+    <!-- Slide 2 -->
+    <section class="left-align">
+
+        <h2>Results</h2>
+
+
+        <ul>
+
+            <p>
+                <img src="{{ url_for('static', filename='images/robot_result.png') }}"
+                    style="width: 100%; height: auto; display: block; margin: 0 auto;">
+            </p>
+
+
+            <li>
+                Please check out <a href="https://github.com/haranarasaratnam">my github repo</a> for MATLAB code.
+            </li>
+
+        </ul>
+        <p style="text-align: right;">Page 4</p>
+        <hr class="full-width">
+    </section>
+
+
+{% endblock %}
