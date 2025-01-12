@@ -11,12 +11,16 @@ BOOKS = {
                         'template': 'books/book1/ch1_1.html'
                     },
                     'ch1_2': {
-                        'title': '1.2: Kalman Filtering',
+                        'title': '1.2: Bayesian Filtering',
                         'template': 'books/book1/ch1_2.html'
                     },
                     'ch1_3': {
-                        'title': '1.3: Use Case 1: Estimation  with DC Motor',
+                        'title': '1.3: Kalman Filtering',
                         'template': 'books/book1/ch1_3.html'
+                    },
+                    'ch1_4': {
+                        'title': '1.4: Use Case 1: Estimation  with DC Motor',
+                        'template': 'books/book1/ch1_4.html'
                     },
                 }
             },
@@ -125,15 +129,96 @@ BOOKS = {
         'title': 'Control',
         'chapters': {
             'ch1': {
-                'title': 'Chapter 1: Getting Started',
-                'template': 'books/book2/ch1.html',
+                'title': 'Chapter 1: Analysis of Dynamical Systems',
+                #'template': 'books/book2/ch1.html',
                 'subchapters': {
                     'ch1_1': {
-                        'title': '1.1: Basics',
+                        'title': '1.1: Controllability',
                         'template': 'books/book2/ch1_1.html'
-                    }
+                    },
+                    'ch1_2': {
+                        'title': '1.2: Observability',
+                        'template': 'books/book2/ch1_2.html'
+                    },
+                    'ch1_3': {
+                        'title': '1.3: Stability Analysis',
+                        'template': 'books/book2/ch1_3.html'
+                    },
+
                 }
-            }
+            },
+
+            'ch2': {
+                'title': 'Chapter 2: PID Controllers',
+                # 'template': 'books/book2/ch1.html',
+                'subchapters': {
+                    'ch2_1': {
+                        'title': '2.1: Overview',
+                        'template': 'books/book2/ch2_1.html'
+                    },
+                    'ch2_2': {
+                        'title': '2.2: Tuning Startegies',
+                        'template': 'books/book2/ch2_2.html'
+                    },
+                    'ch2_3': {
+                        'title': '2.3: Use Cases',
+                        'template': 'books/book2/ch2_3.html'
+                    },
+
+                }
+            },
+
+            'ch3': {
+                'title': 'Chapter 3: State Feedback Control',
+                # 'template': 'books/book2/ch1.html',
+                'subchapters': {
+                    'ch3_1': {
+                        'title': '3.1: Seperation Principle',
+                        'template': 'books/book2/ch3_1.html'
+                    },
+                    'ch3_2': {
+                        'title': '3.2: Pole Placement',
+                        'template': 'books/book2/ch3_2.html'
+                    },
+                    'ch3_3': {
+                        'title': '3.3: LQR Control',
+                        'template': 'books/book2/ch3_3.html'
+                    },
+
+                }
+            },
+
+            'ch4': {
+                'title': 'Chapter 4: Advanced Topics',
+                # 'template': 'books/book2/ch1.html',
+                'subchapters': {
+                    'ch4_1': {
+                        'title': '4.1: MPC Control',
+                        'template': 'books/book2/ch4_1.html'
+                    },
+                    'ch4_2': {
+                        'title': '4.2: Robust Control',
+                        'template': 'books/book2/ch4_2.html'
+                    },
+                    'ch4_3': {
+                        'title': '4.3: Sliding Mode Control',
+                        'template': 'books/book2/ch4_3.html'
+                    },
+
+                }
+            },
+
+            'ch5': {
+                'title': 'Chapter 5: Practical Tips',
+                # 'template': 'books/book2/ch1.html',
+                'subchapters': {
+                    'ch5_1': {
+                        'title': '5.1: Tip # 1',
+                        'template': 'books/book2/ch5_1.html'
+                    },
+
+                }
+            },
         }
     },
 

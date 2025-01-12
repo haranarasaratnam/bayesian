@@ -2,85 +2,6 @@
 
 {% block content %}
 
-
-    <div class="content">
-        <h1>Estimation II: Discrete-Time Kalman Filter</h1>
-        <h2>1. Background</h2>
-        <p>The problem we are seeking to solve is the continual estimation of a set of parameters whose values change over time. Updating is achieved by combining a set of observations or measurements \( z(t) \) which contain information about the signal of interest \( x(t) \).</p>
-        <p>The role of the estimator is to provide an estimate \( \hat{x}(t + \tau) \) at some time \( t + \tau \). If \( \tau > 0 \), we have a prediction filter; if \( \tau < 0 \), a smoothing filter; and if \( \tau = 0 \), the operation is called filtering.</p>
-
-        <h2>2. Notation</h2>
-        <ul>
-            <li>\( z_k \): Observation vector at time \( k \)</li>
-            <li>\( Z_k \): The set of all observations up to (and including) time \( k \)</li>
-            <li>\( x_k \): System state vector at time \( k \)</li>
-            <li>\( \hat{x}_{k|i} \): Estimation of \( x \) at time \( k \) based on time \( i \)</li>
-            <li>\( P_k \): Covariance matrix</li>
-            <li>\( F_k \): State transition matrix</li>
-            <li>\( G_k \): Input (control) transition matrix</li>
-            <li>\( H_k \): Output transition matrix</li>
-            <li>\( w_k \): Process noise vector</li>
-            <li>\( v_k \): Measurement noise vector</li>
-        </ul>
-
-        <h2>3. System and Observation Model</h2>
-        <p>The system can be modeled by the state transition equation:</p>
-        <p>\[ x_{k+1} = F_k x_k + G_k u_k + w_k \]</p>
-        <p>And the observations can be modeled as:</p>
-        <p>\[ z_k = H_k x_k + v_k \]</p>
-
-        <h2>4. Assumptions</h2>
-        <ul>
-            <li>\( E[w_k w_l^T] = Q_k \) for \( k = l \)</li>
-            <li>\( E[v_k v_l^T] = R_k \) for \( k = l \)</li>
-            <li>\( E[w_k v_l^T] = 0 \) for all \( k, l \)</li>
-        </ul>
-
-        <h2>5. Prediction Step</h2>
-        <p>The predicted state is given by:</p>
-        <p>\[ \hat{x}_{k+1|k} = F_k \hat{x}_{k|k} + G_k u_k \]</p>
-        <p>The predicted error covariance is:</p>
-        <p>\[ P_{k+1|k} = F_k P_{k|k} F_k^T + Q_k \]</p>
-
-        <h2>6. Update Step</h2>
-        <p>The Kalman Gain is given by:</p>
-        <p>\[ K_{k+1} = P_{k+1|k} H_{k+1}^T (H_{k+1} P_{k+1|k} H_{k+1}^T + R_{k+1})^{-1} \]</p>
-        <p>The updated state estimate is:</p>
-        <p>\[ \hat{x}_{k+1|k+1} = \hat{x}_{k+1|k} + K_{k+1} (z_{k+1} - H_{k+1} \hat{x}_{k+1|k}) \]</p>
-        <p>The updated error covariance is:</p>
-        <p>\[ P_{k+1|k+1} = (I - K_{k+1} H_{k+1}) P_{k+1|k} \]</p>
-
-        <h2>7. Innovation</h2>
-        <p>The innovation is defined as:</p>
-        <p>\[ \nu_{k+1} = z_{k+1} - H_{k+1} \hat{x}_{k+1|k} \]</p>
-        <p>And its covariance is:</p>
-        <p>\[ S_{k+1} = H_{k+1} P_{k+1|k} H_{k+1}^T + R_{k+1} \]</p>
-
-        <h2>8. Example</h2>
-        <p>Consider a vehicle tracking problem where a vehicle is constrained to move in a straight line with constant velocity. The system state equations are:</p>
-        <p>\[ x_{k+1} = F_k x_k + w_k \]</p>
-        <p>\[ z_k = H_k x_k + v_k \]</p>
-
-        <h2>9. Conclusion</h2>
-        <p>The Kalman filter offers an optimal recursive estimation framework for linear Gaussian dynamic systems.</p>
-
-        <h2>References</h2>
-        <p>Ian Reid, <em>Estimation II</em>, Hilary Term, 2001.</p>
-    </div>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
     <section class="left-align">
 
         <h2>Introduction</h2>
@@ -154,12 +75,12 @@
 
 
         <li>
-            Although we have the optimal solution (the celebrated Kalman filter) to the linear Gaussian systems, we
-            do not have an
-            optimal solution to nonlinear systems.
+            For linear Gaussian systems, we have the optimal solution called the celebrated Kalman filter.
+
         </li>
 
-        <li>In the literature, researchers in the past have taken two approaches to derive an approximate solution:
+        <li>For non-linear and/or non-Gaussian systems however, we             do not have an
+            optimal solution to nonlinear systems. The researchers in the past have taken two approaches to derive an approximate solution:
             <ul>
                 <li>
                     Kalman-like (Innovations based) algorithms:
