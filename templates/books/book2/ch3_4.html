@@ -1,0 +1,59 @@
+{% extends "base_chapter.html" %}
+
+{% block content %}
+
+
+
+
+
+    <div class="content">
+        <h1>Observer-Based Control for Inverted Pendulum</h1>
+
+        <h2>Observer-Based Control</h2>
+        <p>
+            The response achieved above is good, but was based on the assumption of full-state feedback, which is not necessarily valid. To address the situation where not all state variables are measured, a state estimator must be designed. A state estimator (or observer) is a system that provides estimates of the internal state variables of a system based on the measurements of the input and output of the system. The observer has the same dynamics as the original system, with an additional term involving the difference between the actual output and the estimated output. This difference is multiplied by a gain matrix \( L \), known as the observer gain.
+        </p>
+
+        <p>
+            The observer-based state-space equations are:
+        </p>
+        <div class="equation">
+            <p>\[
+            \begin{aligned}
+                \dot{\hat{x}} &= A\hat{x} + Bu + L(y - \hat{y}) \\
+                \hat{y} &= C\hat{x}
+            \end{aligned}
+            \]</p>
+        </div>
+
+        <p>
+            The observer gain matrix \( L \) is designed to place the poles of the observer at desired locations in the left-half of the complex plane to ensure stability and satisfactory performance. The poles of the observer should be placed faster than the poles of the controller to ensure that the estimated states converge quickly to the actual states.
+        </p>
+
+        <p>
+            In MATLAB, the observer gain \( L \) can be designed using the <code>place</code> function:
+        </p>
+        <pre>
+L = place(A', C', desired_observer_poles)';
+        </pre>
+
+        <p>
+            The overall control law with the observer is:
+        </p>
+        <div class="equation">
+            <p>\[
+            u = -K\hat{x} + r
+            \]</p>
+        </div>
+
+        <p>
+            Here, \( \hat{x} \) is the estimated state vector provided by the observer, \( K \) is the state feedback gain matrix, and \( r \) is the reference input.
+        </p>
+
+        <p>
+            By implementing this observer-based control scheme, we can achieve desired performance even when not all state variables are directly measurable.
+        </p>
+    </div>
+
+
+{% endblock %}

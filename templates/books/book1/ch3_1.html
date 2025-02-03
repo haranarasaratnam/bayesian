@@ -1,1 +1,178 @@
 {% extends "base_chapter.html" %}
+
+{% block content%}
+<h2>3.1 Conceptual Recursive Bayesian Filters Revisited</h2>
+
+Prediction:
+
+Update:
+
+The above integrals are intractable except for Linear Gausiian case.
+
+The solution is to use Monte Carlo sampling. To approximate the probabilities, we use particles with corresponding
+weights
+
+<h2>3.2 Monte Carlo Integration</h2>
+   <p>Let us start with Monte Carlo integration, which is the basis of SMC methods. Suppose we want to numerically evaluate a multidimensional integral:</p>
+    <p>\[ I = \int g(x)dx \]</p>
+    <p>where \( x \in \mathbb{R}^{n_x} \). Monte Carlo (MC) methods for numerical integration [9] factorize \( g(x) = f(x) \cdot \pi(x) \) in such a way that \( \pi(x) \) is interpreted as a probability density satisfying \( \pi(x) \geq 0 \) and \( \int \pi(x)dx = 1 \). The assumption is that it is possible to draw \( N \gg 1 \) samples \( \{x^{(i)}; i = 1, \dots, N\} \) distributed according to \( \pi(x) \). The MC estimate of integral</p>
+    <p>\[ I = \int f(x)\pi(x)dx \]</p>
+    <p>is the sample mean:</p>
+    <p>\[ I_N = \frac{1}{N} \sum_{i=1}^{N} f(x^{(i)}) \]</p>
+    <p>provided that \( \pi(x)/q(x) \) is upper bounded. A Monte Carlo estimate of \( I \) is computed by generating \( N \gg 1 \) independent samples \( \{x^{(i)}; i = 1, \dots, N\} \) distributed according to \( q(x) \) and forming the weighted sum:</p>
+    <p>\[ I_N = \sum_{i=1}^{N} f(x^{(i)}) w(x^{(i)}) \]</p>
+    <p>where \( w(x^{(i)}) = \frac{\pi(x^{(i)})}{q(x^{(i)})} \) are the importance weights. If the normalizing factor of the desired density \( \pi(x) \) is unknown, we need to perform normalization of the importance weights. Then we estimate \( I_N \) as follows:</p>
+    <p>\[ I_N = \sum_{i=1}^{N} f(x^{(i)}) \tilde{w}(x^{(i)}) \]</p>
+    <p>where the normalized importance weights are given by:</p>
+    <p>\[ \tilde{w}(x^{(i)}) = \frac{w(x^{(i)})}{\sum_{j=1}^{N} w(x^{(j)})} \]</p>
+    <p>This technique is applied in the Bayesian framework, where \( \pi(x) \) is the posterior density.</p>
+
+
+<h2>3.3 Importance Sampling</h2>
+    <p>
+        Importance sampling is a technique used to estimate properties of a target distribution <code>p(x)</code>
+        by drawing samples from a different importance (aka proposal) distribution <code>q(x)</code>.
+    </p>
+
+    <p>
+        The expectation of a function <code>f(x)</code> under the target distribution <code>p(x)</code> is given by:
+    </p>
+    <p>
+        \( E_p[f(x)] = \int f(x) p(x) dx \)
+    </p>
+    <p>
+        Using importance sampling, we approximate it as:
+    </p>
+    <p>
+        \( E_p[f(x)] \approx \sum_{i=1}^{N} f(x_i) w(x_i) \)
+    </p>
+    <p>where \( w(x) = \frac{p(x)}{q(x)} \) are the importance weights.</p>
+
+   <p>Importance sampling is a general MC integration method that we now apply to perform nonlinear filtering specified by the conceptual solution in Section 1.2. The resulting sequential importance sampling (SIS) algorithm is a Monte Carlo method that forms the basis for most sequential MC filters developed over the past decades; see [8, 10]. This sequential Monte Carlo approach is known variously as bootstrap filtering [4], the condensation algorithm [11], particle filtering [12], interacting particle approximations [13], and survival of the fittest [14]. It is a technique for implementing a recursive Bayesian filter by Monte Carlo simulations. The key idea is to represent the required posterior density function by a set of random samples with associated weights and to compute estimates based on these samples and weights. As the number of samples becomes very large, this Monte Carlo characterization becomes an equivalent representation to the usual functional description of the posterior pdf, and the SIS filter approaches the optimal Bayesian estimator.</p>
+
+    <p>Before we develop the details of the algorithm, let us introduce \( X_k = \{X_j, j = 0, \dots, k\} \), which represents the sequence of all target states up to time \( k \). The joint posterior density at time \( k \) is denoted by \( p(X_k | Z_k) \), and its marginal is \( p(x_k | Z_k) \). Let \( \{X_k^{(i)}, w_k^{(i)}\}_{i=1}^{N} \) denote a random measure that characterizes the joint posterior \( p(X_k | Z_k) \), where \( \{X_k^{(i)}, i = 1, \dots, N\} \) is a set of support points with associated weights \( \{w_k^{(i)}, i = 1, \dots, N\} \). The weights are normalized such that \( \sum_{i=1}^{N} w_k^{(i)} = 1 \). Then, the joint posterior density at \( k \) can be approximated as follows [8]:</p>
+    <p>\[ p(X_k | Z_k) \approx \sum_{i=1}^{N} w_k^{(i)} \delta(X_k - X_k^{(i)}) \]</p>
+    <p>We therefore have a discrete weighted approximation of the true posterior, \( p(X_k | Z_k) \). The normalized weights \( w_k^{(i)} \) are chosen using the principle of importance sampling described earlier. If the samples \( X_k^{(i)} \) were drawn from an importance density \( q(X_k | Z_k) \), then according to (3.7)</p>
+    <p>\[ w_k^{(i)} \propto \frac{p(X_k^{(i)} | Z_k)}{q(X_k^{(i)} | Z_k)} \]</p>
+
+
+<h3> Choice of Importance Density </h3>
+<ul>
+    <li> It should be easy to sample from the importance density</li>
+    <li> Importance density should  resemble the original density as closely as possible</li>
+</ul>
+
+  <p>
+          <p>The following Python script approximates the integral \( \int_{0}^{\infty} e^{-x} dx \) using importance sampling.</p>
+
+        This script demonstrates how importance sampling helps estimate an expectation using a proposal distribution
+        that is different from the target distribution.
+    </p>
+
+
+    <pre><code>
+import numpy as np
+import matplotlib.pyplot as plt
+from scipy.stats import gamma, expon
+
+# Define target distribution p(x) ~ exp(-x) (normalized)
+def p(x):
+    return np.exp(-x) * (x >= 0)  # Ensuring values only for x >= 0
+
+# Define proposal distribution q(x) ~ Gamma(shape, scale)
+shape, scale = 1, 1  # Shape (α) and scale (β) parameters of Gamma # perfect match
+
+# Define proposal distribution q(x) ~ Gamma(shape, scale)
+shape, scale = 2, 2  # Shape (α) and scale (β) parameters of Gamma # perfect match
+
+# Define proposal distribution q(x) ~ Gamma(shape, scale)
+shape, scale = 9, 2  # Shape (α) and scale (β) parameters of Gamma # perfect match
+
+
+def q(x):
+    return gamma.pdf(x, shape, scale=scale)
+
+# Generate samples from the Gamma proposal distribution
+N = 10000
+samples = gamma.rvs(shape, scale=scale, size=N)
+
+# Compute importance weights w(x) = p(x) / q(x)
+weights = p(samples) / q(samples)
+
+# Estimate integral
+integral_estimate = np.mean(weights)
+print(f"Estimated integral: {integral_estimate:.4f}")
+
+# Plot proposal and target distributions
+x_vals = np.linspace(0, 5, 1000)
+plt.plot(x_vals, p(x_vals), label="Target p(x) ~ exp(-x)", linestyle="dashed")
+plt.plot(x_vals, q(x_vals), label=f"Proposal q(x) ~ Gamma({shape},{scale})")
+plt.hist(samples, bins=50, density=True, alpha=0.3, label="Samples from q(x)")
+plt.legend()
+plt.show()
+    </code></pre>
+
+
+
+<h2>3.4 Resampling</h2>
+
+Problem:
+The problem encountered by the SIS method is that, as t increase, the distribution of the importance weight becomes more and more skewed. And after a few time step, only one particle has a non-zero importance weight.
+(Degeneracy)
+Solution:
+the key idea is to eliminate the particles having low importance weights and multiply particles having high importance weigh
+(Resampling)
+
+    <p>Whenever a significant degeneracy is observed (i.e., when \( N_{\text{eff}} \) falls below some threshold \( N_{\text{th}} \)), resampling is required in the SIS algorithm. Resampling eliminates samples with low importance weights and multiplies samples with high importance weights (in apparent analogy to genetic algorithms). It involves a mapping of random measure \( \{X_k^{(i)}, w_k^{(i)}\} \) into a random measure \( \{X_k^{*(i)}, 1/N\} \) with uniform weights. The new set of random samples \( \{X_k^{*(i)}\} \) is generated by resampling (with replacement) \( N \) times from an approximate discrete representation of \( p(X_k | Z_k) \) given by</p>
+    <p>\[ p(X_k | Z_k) \approx \sum_{i=1}^{N} w_k^{(i)} \delta(X_k - X_k^{(i)}) \]</p>
+    <p>so that \( P\{X_k^{*(i)} = X_k^{(i)}\} = w_k^{(i)} \). The resulting sample is an i.i.d. sample from the discrete density (3.19), and hence the new weights are uniform. The selection \( X_k^{*(i)} = X_k^{(i)} \) is schematically shown in Figure 3.1 [17], where acronym CSW stands for the cumulative sum of weights of random measure \( \{X_k^{(i)}, w_k^{(i)}\} \), and random variable \( u_i, i = 1, \dots, N \) is uniformly distributed on the interval [0, 1].</p>
+
+    <h3>Figure 3.1</h3>
+    <p>The process of resampling: \( u_i \sim U[0, 1] \) maps into index \( j \); the corresponding particle \( X_k^{(j)} \) has a good chance of being selected and multiplied because of its high value of \( w_k^{(j)} \).</p>
+
+    <h3>Table 3.2</h3>
+    <p>Resampling Algorithm</p>
+
+    \[{X_k^{*(i)}, w_k^{*(i)}, i} = RESAMPLE({X_k^{(i)}, w_k^{(i)}})\]
+    1. Initialize the CSW: \[ c_1 = w_k^{(1)} \]
+    2. FOR \( i = 2 : N \)
+         Construct CSW: \[ c_i = c_{i-1} + w_k^{(i)} \]
+    3. END FOR<br>
+    4. Start at the bottom of the CSW: \( i = 1 \)<br>
+    5. Draw a starting point: \( u_1 \sim U[0, N^{-1}] \)<br>
+    6. FOR \( j = 1 : N \)
+        a. Move along the CSW: \( u_j = u_1 + N^{-1}(j - 1) \)
+        b. WHILE \( u_j > c_i \)
+            i. \( i = i + 1 \)
+        c. END WHILE
+        d. Assign sample: \( X_k^{*(j)} = X_k^{(i)} \)
+        e. Assign weight: \( w_k^{*(j)} = N^{-1} \)
+        f. Assign parent: \( i_j = i \)<br>
+    7. END FOR
+
+
+
+<h2>3.5 SIR Particle Filters</h2>
+    <p>Particle filters (PFs) are also suboptimal filters. They perform sequential Monte Carlo (SMC) estimation based on point mass (or "particle") representation of probability densities. The basic SMC ideas in the form of sequential importance sampling had been introduced in statistics back in the 1950s [1]. Although these ideas continued to be explored sporadically during the 1960s and 1970s [2, 3], they were largely overlooked and ignored. Most likely the reason for this was the modest computational power available at the time. In addition, all these early implementations were based on plain sequential importance sampling, which, as we shall describe later, degenerates over time. The major contribution to the development of the SMC method was the inclusion of the resampling step [4], which, coupled with ever faster computers, made the particle filters useful in practice for the first time. Since then research activity in the field has dramatically increased [5, 6], resulting in many improvements of particle filters and their numerous applications. This chapter reviews the theoretical basis and the recent developments in a design of efficient particle filters, mainly following [7, 8].</p>
+
+
+
+    <h3>Table 3.3</h3>
+    <p>Generic Particle Filter</p>
+
+    \[{X_k^{(i)}, w_k^{(i)}} = PF({X_{k-1}^{(i)}, w_{k-1}^{(i)}}, z_k)\]
+    1. Filtering via SIS (Table 3.1):
+        \[{X_k^{(i)}, w_k^{(i)}} = SIS({X_{k-1}^{(i)}, w_{k-1}^{(i)}}, z_k)\]
+    2. Calculate \( N_{\text{eff}} \) using (3.18)
+    3. IF \( N_{\text{eff}} < N_{\text{th}} \)
+        a. Resample using the algorithm in Table 3.2:
+            \[{X_k^{*(i)}, w_k^{*(i)}} = RESAMPLE({X_k^{(i)}, w_k^{(i)}})\]
+    4. END IF
+
+
+
+{% endblock %}
+
+
+{% block scripts %}
+{% endblock %}

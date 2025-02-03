@@ -3,4 +3,78 @@
 {% block content %}
 
 
+<body>
+    <h1>Linear Control System Analysis and Design</h1>
+
+    <div class="equation">
+        <p>\[
+        \dot{x} = Ax + Bu \tag{16.1}
+        \]</p>
+        <p>\[
+        y = Cx + Du \tag{16.2}
+        \]</p>
+    </div>
+
+    <p><strong>Where:</strong></p>
+    <ul>
+        <li>\(x, y, \text{ and } u\) are vectors.</li>
+        <li>\(A, B, C, \text{ and } D\) are matrices with dimensions:</li>
+    </ul>
+    <div class="equation">
+        <p>\[
+        x: n \times 1, \quad y: \ell \times 1, \quad u: m \times 1, \quad A: n \times n, \quad B: n \times m, \quad C: \ell \times n, \quad D: \ell \times m
+        \]</p>
+    </div>
+
+<h2>Controlability</h2>
+    A system is said to be controllable if there exists an input u that can take the initial state x(0) to a desired state  x(t) in finite time.
+Before we design our controller, we will first verify that the system is controllable. Satisfaction of this property means that we can drive the
+    state of the system anywhere we like in finite time (under the physical constraints of the system).
+For example
+Controllability ensures that the robotic arm  can be moved to different position when the specific input is given
+
+The Matlab command ctrb(A,B) returns the controllability matrix:
+\[
+    Co = [A~ AB \ldots AB^{n-1]}
+
+    \]
+For the
+    system is controllable, the controllability matrix \(Co\) must have full rank  \(n\).
+where the rank of a matrix is the number of linearly independent rows (or columns).
+
+
+Determine the number of uncontrollable states. length(A) - rank(Co)
+
+To find which state are uncontrollable, find the null space of the controllability matrix.Test which
+    eigenvectors of A are aligned with the null space of the controllability matrix. These correspond to
+    the uncontrollable states
+
+
+
+
+<h2>Observability</h2>
+
+ system is observable if the knowledge of input u(t) and the output y(t) over \(0\gtt\gtT\) is sufficient to accurately estimate the hidden state x(t)
+over \(0\gtt\gtT\)
+For example,  observability ensures that  the hidden states can be inverted from the inputs and measurements
+obsv computes the observability matrix for state-space systems.
+
+obsv(A,C) returns the observability matrix
+\[
+Ob = [AC]
+\]
+with n columns and np rows.
+
+Volume command will guide to order which measurement carries higher weight to estimate the hidden states
+
+
+Rank (Ob) is full
+
+<h2>
+    Example: Inverted Pendulum
+
+</h2>
+
+
+
 {% endblock %}

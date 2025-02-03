@@ -1,1 +1,123 @@
 {% extends "base_chapter.html" %}
+
+{% block content %}
+
+<h1>Unscented Kalman Filter</h1>
+
+<p>
+    A way to reduce the linearization errors of the Extended Kalman Filter (EKF) is to consider the Unscented Kalman
+    Filter (UKF).
+    The UKF propagates Gaussian random variables representing the state through system dynamics by using a deterministic
+    sampling approach.
+    The state distribution is represented using a minimal set of carefully chosen sample points. These sample points
+    completely capture
+    the true mean and covariance of the state and, when propagated through the true nonlinear system, capture the
+    posterior mean and
+    covariance accurately to second order for any nonlinearity (Julier & Uhlmann, 2004).
+</p>
+
+<h2>Filter Initialization</h2>
+<p>
+    The UKF algorithm is initialized as follows:
+</p>
+
+<div class="equation">
+    \[
+    \hat{x}_0 = E[x_0]
+    \]
+    \[
+    \hat{P}_0 = E[(x_0 - \hat{x}_0)(x_0 - \hat{x}_0)^T]
+    \]
+</div>
+
+<p>where \(\hat{P}_0\) represents the error covariance matrix of the estimated state vector.</p>
+
+<h2>Time Update Equations</h2>
+
+<h3>(1) Generate the Sigma Points:</h3>
+
+<div class="equation">
+    \[
+    v_k^{(0)} = \hat{x}_{k-1}
+    \]
+    \[
+    v_k^{(i)} = \hat{x}_{k-1} + \sqrt{(n+\lambda) \hat{P}_{k-1}}, \quad i=1, ..., n
+    \]
+    \[
+    v_k^{(i)} = \hat{x}_{k-1} - \sqrt{(n+\lambda) \hat{P}_{k-1}}, \quad i=n+1, ..., 2n
+    \]
+</div>
+
+<p>where \(\lambda\) is a scaling parameter.</p>
+
+<h3>(2) Propagate the Sigma Points:</h3>
+
+<div class="equation">
+    \[
+    \bar{v}_k^{(i)} = f(v_k^{(i)}), \quad i = 0, ..., 2n
+    \]
+</div>
+
+<h3>(3) Compute the Predicted State and Covariance:</h3>
+
+<div class="equation">
+    \[
+    \hat{x}_{k|k-1} = \sum_{i=0}^{2n} W_m^{(i)} \bar{v}_k^{(i)}
+    \]
+    \[
+    \hat{P}_{k|k-1} = \sum_{i=0}^{2n} W_c^{(i)} (\bar{v}_k^{(i)} - \hat{x}_{k|k-1}) (\bar{v}_k^{(i)} -
+    \hat{x}_{k|k-1})^T + Q_k
+    \]
+</div>
+
+<h2>Measurement Update Equations</h2>
+
+<h3>(4) Transform Sigma Points through Measurement Model:</h3>
+
+<div class="equation">
+    \[
+    w_k^{(i)} = h(v_k^{(i)}), \quad i = 0, ..., 2n
+    \]
+</div>
+
+<h3>(5) Compute the Predicted Measurement and Covariances:</h3>
+
+<div class="equation">
+    \[
+    \hat{y}_k = \sum_{i=0}^{2n} W_m^{(i)} w_k^{(i)}
+    \]
+    \[
+    P_{yy,k} = \sum_{i=0}^{2n} W_c^{(i)} (w_k^{(i)} - \hat{y}_k) (w_k^{(i)} - \hat{y}_k)^T + R_k
+    \]
+    \[
+    P_{xy,k} = \sum_{i=0}^{2n} W_c^{(i)} (v_k^{(i)} - \hat{x}_{k|k-1}) (w_k^{(i)} - \hat{y}_k)^T
+    \]
+</div>
+
+<h3>(6) Compute Kalman Gain and Update Estimates:</h3>
+
+<div class="equation">
+    \[
+    K_k = P_{xy,k} P_{yy,k}^{-1}
+    \]
+    \[
+    \hat{x}_k = \hat{x}_{k|k-1} + K_k (y_k - \hat{y}_k)
+    \]
+    \[
+    \hat{P}_k = \hat{P}_{k|k-1} - K_k P_{yy,k} K_k^T
+    \]
+</div>
+
+<h2>Conclusion</h2>
+
+<p>
+    The UKF improves upon the EKF by avoiding linearization and instead using a deterministic sampling approach. This
+    makes it more
+    accurate in highly nonlinear systems while maintaining computational efficiency. However, it requires \(2n+1\) sigma
+    points, which
+    increases the computational burden compared to the EKF.
+</p>
+
+
+
+{% endblock %}

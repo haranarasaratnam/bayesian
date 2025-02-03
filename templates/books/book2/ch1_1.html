@@ -2,5 +2,131 @@
 
 {% block content %}
 
+<h1> Frequency Domain Analysis</h1>
+
+
+    <div class="content">
+        <h1>DC Motor Speed: Frequency Domain Methods for Controller Design</h1>
+
+        <p>
+            From the main problem, the dynamic equations in the Laplace domain and the open-loop transfer function of the DC Motor are the following:
+        </p>
+
+        <div class="equation">
+            <p>\[
+            s(Js + b)\Theta(s) = KI(s)
+            \]</p>
+        </div>
+
+        <div class="equation">
+            <p>\[
+            (Ls + R)I(s) = V(s) - Ks\Theta(s)
+            \]</p>
+        </div>
+
+        <div class="equation">
+            <p>\[
+            P(s) = \frac{\dot{\Theta}(s)}{V(s)} = \frac{K}{(Js + b)(Ls + R) + K^2} \quad \left[\frac{\text{rad/sec}}{V}\right]
+            \]</p>
+        </div>
+
+        <p>
+            The structure of the control system has the form shown in the figure below.
+        </p>
+
+        <img src="https://ctms.engin.umich.edu/CTMS/Images/Control/motorspeed_block2.png" alt="Control System Block Diagram">
+
+        <p>
+            For a 1-rad/sec step reference, the design criteria are the following:
+        </p>
+
+        <ul>
+            <li>Settling time less than 2 seconds</li>
+            <li>Overshoot less than 5%</li>
+            <li>Steady-state error less than 1%</li>
+        </ul>
+
+        <p>
+            Now let's design a controller using the methods introduced in the <a href="https://ctms.engin.umich.edu/CTMS/index.php?example=Introduction&section=ControlFrequency">Introduction: Frequency Domain Methods for Controller Design</a> page. Create a new m-file and type in the following commands:
+        </p>
+
+        <pre>
+J = 0.01;
+b = 0.1;
+K = 0.01;
+R = 1;
+L = 0.5;
+s = tf('s');
+P_motor = K/((J*s+b)*(L*s+R)+K^2);
+        </pre>
+
+        <h2>Drawing the Original Bode Plot</h2>
+
+        <p>
+            The main idea of frequency-based design is to use the Bode plot of the open-loop transfer function to estimate the closed-loop response. Adding a controller to the system changes the open-loop Bode plot, thereby changing the closed-loop response. It is our goal to design the controller to shape the open-loop Bode plot in such a way that the closed-loop system behaves in a desired manner. Let's first draw the Bode plot for the original open-loop plant transfer function. Add the following code to the end of your m-file and run it in the MATLAB command window. You should generate the Bode plot shown below.
+        </p>
+
+        <pre>
+bode(P_motor)
+grid
+title('Bode Plot of the Original Plant')
+        </pre>
+
+        <img src="https://ctms.engin.umich.edu/CTMS/Images/Control/motorspeed_bode1.png" alt="Bode Plot of the Original Plant">
+
+        <h2>Adding Proportional Gain</h2>
+
+        <p>
+            From the Bode plot above, it appears that the gain margin and phase margin of this system are currently infinite, which indicates the system is robust and has minimal overshoot. The problem with this is that the phase margin is infinite because the magnitude plot is below 0 dB at all frequencies. This indicates that the system will have trouble tracking various reference signals without excessive error. Therefore, we would like to increase the gain of the system while still achieving enough phase margin.
+        </p>
+
+        <p>
+            A phase margin of 60 degrees is generally sufficient for stability margin. From the above Bode plot, this phase margin is achieved for a crossover frequency of approximately 10 rad/sec. The gain needed to raise the magnitude plot so that the gain crossover frequency occurs at 10 rad/sec appears to be approximately 40 dB. The exact phase and gain of the Bode plot at a given frequency can be determined by clicking on the graph at the corresponding frequency. The <code>bode</code> command, invoked with left-hand arguments, can also be used to provide the exact phase and magnitude at 10 rad/sec as shown below.
+        </p>
+
+        <pre>
+[mag, phase, w] = bode(P_motor, 10)
+
+mag =
+    0.0139
+phase =
+   -123.6835
+w =
+    10
+        </pre>
+
+        <p>
+            Therefore, the exact phase margin for a gain crossover frequency of 10 rad/sec is 180 - 123.7 = 56.3 degrees. Since the exact magnitude at this frequency is 20 log 0.0139 = -37.1 dB, 37.1 dB of gain must be added to the system. Otherwise stated, a proportional gain of 1/0.0139 = 72 will achieve an open-loop gain of 1 at 10 rad/sec. Add the following commands to your m-file to observe the effect of this proportional controller on the system. In this case, we use the <code>margin</code> command instead of the <code>bode</code> command in order to explicitly see the new gain and phase margins and crossover frequencies.
+        </p>
+
+        <pre>
+Kp = 72;
+C = Kp;
+margin(C*P_motor)
+grid
+title('Bode Plot with Proportional Control')
+        </pre>
+
+        <img src="https://ctms.engin.umich.edu/CT
+::contentReference[oaicite:0]{index=0}
+
+
+
+
+<h2>Bode Plots</h2>
+
+Bode plot is the frequency response plot f the (open loop) transfer function of a system
+It consists of two graphs - Gain/Magnitude Vs Frequency and Phase angle  Vs Frequency
+
+
+
+
+
+<h2> Nyquist Plots</h2>
+
+
+
+<h2>Example</h2>
+
 
 {% endblock %}

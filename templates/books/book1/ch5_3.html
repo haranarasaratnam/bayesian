@@ -2,6 +2,192 @@
 
 {% block content %}
 
+    <div class="content">
+
+        <h1>Interacting Multiple Model Estimator (IMM)</h1>
+
+        <h2>Overview</h2>
+        <p>
+            The IMM estimator is traditionally used in the field of multiple target tracking,
+            especially when the system can be described by a bank of multiple state-space models.
+            It has been shown to handle both maneuvering and non-maneuvering targets effectively.
+            The algorithm consists of multiple interacting filters operating in parallel. The IMM estimator does not make a hard decision but assigns probabilities to modes.
+            It efficiently handles systems with model mismatches and provides a powerful solution
+            to dynamic systems with switching modes.
+        </p>
+
+        <p>
+            The Interacting Multiple Model (IMM) estimator is well-known within the tracking community
+            for its adaptive estimation capability (Section 11.7.4, <em>Estimation with Application to Tracking
+            and Navigation</em> by Bar-Shalom et al.). The objective of this note is to integrate the square-root
+            formulation of a relatively new nonlinear Bayesian estimator called the Cubature Kalman Filter (CKF)
+            with the IMM. The resulting estimator is called the CKF-IMM.
+        </p>
+
+        <h2>IMM Algorithm</h2>
+
+        <p>The IMM algorithm is summarized as follows:</p>
+
+        <ol>
+            <li><strong>Calculation of Mixing Probabilities:</strong>
+                \[
+                \mu_{ij}(k-1 \mid k-1) = \frac{\pi_{ij} \mu_i(k-1)}{C_j}, \quad i, j = 1, \dots, q
+                \]
+                where:
+                \[
+                C_j = \sum_{i=1}^{q} \pi_{ij} \mu_i(k-1)
+                \]
+            </li>
+
+            <li><strong>Mixing:</strong> Initial estimates are mixed using the mixing probabilities:
+                \[
+                x_{0j}(k-1 \mid k-1) = \sum_{i=1}^{q} x_i(k-1 \mid k-1) \mu_{ij}(k-1 \mid k-1)
+                \]
+                Covariance is computed as:
+                \[
+                P_{0j}(k-1 \mid k-1) = \sum_{i=1}^{q} \mu_{ij}(k-1 \mid k-1) \left[ P_i(k-1 \mid k-1) + \big(x_i(k-1 \mid k-1) - x_{0j}(k-1 \mid k-1)\big) \big(x_i(k-1 \mid k-1) - x_{0j}(k-1 \mid k-1)\big)^T \right]
+                \]
+            </li>
+
+            <li><strong>Mode-Matched Filtering:</strong>
+                Each filter uses the mixed initial conditions and observations \( z(k) \) to update the estimates:
+                \[
+                A_j(k) = p[z(k) \mid M_j(k), x_{0j}(k-1 \mid k-1), P_{0j}(k-1 \mid k-1)]
+                \]
+            </li>
+
+            <li><strong>Mode Probability Update:</strong>
+                The mode probability is updated as:
+                \[
+                \mu_j(k) = \frac{A_j(k) \mu_j(k)}{\sum_{j=1}^{q} A_j(k) \mu_j(k)}
+                \]
+            </li>
+
+            <li><strong>State Estimate and Covariance Combination:</strong>
+                The final state estimate is a weighted sum of mode-conditioned estimates:
+                \[
+                x(k \mid k) = \sum_{j=1}^{q} x_j(k \mid k) \mu_j(k)
+                \]
+                The covariance is given by:
+                \[
+                P(k \mid k) = \sum_{j=1}^{q} \mu_j(k) \left[ P_j(k \mid k) + \big(x_j(k \mid k) - x(k \mid k)\big)\big(x_j(k \mid k) - x(k \mid k)\big)^T \right]
+                \]
+            </li>
+        </ol>
+
+        <h2>Figure</h2>
+        <p><em>Figure 3.4</em>: One cycle of the IMM estimator for two models.</p>
+
+        <h2>Applications</h2>
+        <p>The IMM algorithm has been applied to:</p>
+        <ul>
+            <li>Target tracking with glint noise</li>
+            <li>Speech signal enhancement</li>
+            <li>Localization in CDMA environments</li>
+            <li>Secure chaotic communication systems</li>
+        </ul>
+
+    </div>
+
+        <h2>CKF-IMM for Target Tracking</h2>
+
+        <p>
+            In this section we present the air traffic control tracking scenario., starting from
+            [25,000 m, 10,000 m] at time \( t = 0 \, s \), the aircraft flies eastward for
+            125 s at 120 m/s, before executing a \( 1^\circ/s \) coordinated turn for 90 s.
+            Then it flies northward for another 125 s, followed by a \( 3^\circ/s \) turn for 30 s.
+            After the turn, it continues to fly eastward at constant velocity. The aircraft motion
+            can be described by two different motion model segments—the (nearly) constant velocity model
+            and the coordinated turn model.
+        </p>
+
+        <h2>Motion Models</h2>
+
+        <p>The nearly constant velocity model is described by the following linear equation:</p>
+
+            \[
+            x_{k+1} =
+            \begin{bmatrix}
+                1 & T & 0 & 0 \\\\
+                0 & 1 & 0 & 0 \\\\
+                0 & 0 & 1 & T \\\\
+                0 & 0 & 0 & 1
+            \end{bmatrix}
+            x_k +
+            \begin{bmatrix}
+                \frac{1}{2} T^2 & 0 \\\\
+                T & 0 \\\\
+                0 & \frac{1}{2} T^2 \\\\
+                0 & T
+            \end{bmatrix}
+            v_k
+            \]
+
+
+        <p>The nonlinear coordinated-turn model is given by:</p>
+
+            \[
+            x_{k+1} =
+            \begin{bmatrix}
+                1 & \frac{\sin(\omega T)}{\omega} & 0 & -\frac{1-\cos(\omega T)}{\omega} & 0 \\\\
+                0 & \cos(\omega T) & 0 & -\sin(\omega T) & 0 \\\\
+                0 & -\frac{1-\cos(\omega T)}{\omega} & 1 & \frac{\sin(\omega T)}{\omega} & 0 \\\\
+                0 & \sin(\omega T) & 0 & \cos(\omega T) & 0 \\\\
+                0 & 0 & 0 & 0 & 1
+            \end{bmatrix}
+            x_k +
+            \begin{bmatrix}
+                \frac{1}{2} T^2 & 0 & 0 \\\\
+                T & 0 & 0 \\\\
+                0 & \frac{1}{2} T^2 & 0 \\\\
+                0 & T & 0 \\\\
+                0 & 0 & T
+            \end{bmatrix}
+            v_k
+            \]
+
+
+        <h2>Radar Measurement Model</h2>
+
+        <p>The radar, stationed at \([20,000 \, \text{m}, 20,000 \, \text{m}]\), is assumed to measure range and bearing as:</p>
+
+            \[
+            z_{k+1} =
+            \begin{bmatrix}
+                \sqrt{x_{1k+1}^2 + x_{3k+1}^2} \\\\
+                \tan^{-1} \frac{x_{3k+1}}{x_{1k+1}}
+            \end{bmatrix} + w_k
+            \]
+        <p>The measurement noise covariance \( R \) is given by:</p>
+            \[
+            R = \text{cov}(w_k) = \text{diag}([\sigma_r^2, \sigma_\theta^2])
+            \]
+
+
+        <p>For the IMM-based approach, the initial mode probabilities are assumed to be
+       \[
+            \mu(0) = [0.5,  0.5]^{T}
+            \]
+           and the mode switching probability matrix is given bu
+            \[
+            \begin{bmatrix}
+            \pi_{11} & \pi_{12}\\\\
+            \pi_{21} & \pi_{22}
+            \end{bmatrix} =
+             \begin{bmatrix}
+            0.95 & 0.05\\\\
+            0.05 & 0.95
+            \end{bmatrix}
+
+            \]
+        </p>
+        <h2>Figures</h2>
+
+        <p>The results are shown in the following figures:</p>
+        <p><em>Note: Add images here if necessary.</em></p>
+
+
+    </div>
 
 
 {% endblock %}

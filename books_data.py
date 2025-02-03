@@ -113,12 +113,20 @@ BOOKS = {
             },
 
             'ch6': {
-                'title': 'Chapter 6: Suggested Readings',
+                'title': 'Chapter 6: Research Topics, References and Contributors',
                 # 'template': 'books/book1/ch2_1.html'
                 'subchapters': {
                     'ch6_1': {
-                        'title': '6.1: References',
+                        'title': '6.1: Research Topics',
                         'template': 'books/book1/ch6_1.html'
+                    },
+                    'ch6_2': {
+                        'title': '6.2: References',
+                        'template': 'books/book1/ch6_2.html'
+                    },
+                    'ch6_3': {
+                        'title': '6.3: Contributors',
+                        'template': 'books/book1/ch6_3.html'
                     },
                 },
             },
@@ -133,16 +141,21 @@ BOOKS = {
                 #'template': 'books/book2/ch1.html',
                 'subchapters': {
                     'ch1_1': {
-                        'title': '1.1: Controllability',
+                        'title': '1.1: Frequency Domain Analysis',
                         'template': 'books/book2/ch1_1.html'
                     },
+
                     'ch1_2': {
-                        'title': '1.2: Observability',
+                        'title': '1.2: State-space Analysis',
                         'template': 'books/book2/ch1_2.html'
                     },
                     'ch1_3': {
-                        'title': '1.3: Stability Analysis',
+                        'title': '1.3: TBD',
                         'template': 'books/book2/ch1_3.html'
+                    },
+                    'ch1_4': {
+                        'title': '1.4: Stability Analysis',
+                        'template': 'books/book2/ch1_4.html'
                     },
 
                 }
@@ -177,12 +190,16 @@ BOOKS = {
                         'template': 'books/book2/ch3_1.html'
                     },
                     'ch3_2': {
-                        'title': '3.2: Pole Placement',
+                        'title': '3.2: FSF Control Using Pole Placement',
                         'template': 'books/book2/ch3_2.html'
                     },
                     'ch3_3': {
-                        'title': '3.3: LQR Control',
+                        'title': '3.3: FSF Control Using LQR Control',
                         'template': 'books/book2/ch3_3.html'
+                    },
+                    'ch3_4': {
+                        'title': '3.4: LQG Control',
+                        'template': 'books/book2/ch3_4.html'
                     },
 
                 }
@@ -218,6 +235,24 @@ BOOKS = {
                     },
 
                 }
+            },
+            'ch6': {
+                'title': 'Chapter 6: Research Topics, References and Contributors',
+                # 'template': 'books/book1/ch2_1.html'
+                'subchapters': {
+                    'ch6_1': {
+                        'title': '6.1: Research Topics',
+                        'template': 'books/book2/ch6_1.html'
+                    },
+                    'ch6_2': {
+                        'title': '6.2: References',
+                        'template': 'books/book2/ch6_2.html'
+                    },
+                    'ch6_3': {
+                        'title': '6.3: Contributors',
+                        'template': 'books/book2/ch6_3.html'
+                    },
+                },
             },
         }
     },

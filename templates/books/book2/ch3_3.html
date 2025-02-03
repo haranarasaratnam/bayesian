@@ -1,6 +1,135 @@
 {% extends "base_chapter.html" %}
 
 {% block content %}
+    <div class="content">
+        <h1>Linear Quadratic Regulation (LQR)</h1>
+
+        <p>
+            The next step in the design process is to find the vector of state-feedback control gains, assuming that we have access (i.e., can measure) all four of the state variables. This can be accomplished using the Linear Quadratic Regulator (LQR) method, which generates the "best" gain matrix without explicitly choosing to place the closed-loop poles in particular locations. This type of control technique optimally balances the system error and the control effort based on a cost that the designer specifies, defining the relative importance of minimizing errors and minimizing control effort.
+        </p>
+
+        <p>
+            The LQR method involves defining a cost function \( J \) that the controller aims to minimize:
+        </p>
+        <div class="equation">
+            <p>\[
+            J = \int_0^\infty (x^T Q x + u^T R u) \, dt
+            \]</p>
+        </div>
+
+        <p>
+            In this equation:
+        </p>
+        <ul>
+            <li>\( x \) is the state vector.</li>
+            <li>\( u \) is the control input.</li>
+            <li>\( Q \) is a positive semi-definite matrix that penalizes the state variables.</li>
+            <li>\( R \) is a positive definite matrix that penalizes the control effort.</li>
+        </ul>
+
+        <p>
+            The matrices \( Q \) and \( R \) are chosen by the designer to reflect the desired trade-off between state regulation and control effort. Once these matrices are defined, the optimal state-feedback gain matrix \( K \) can be computed using MATLAB's <code>lqr</code> function:
+        </p>
+        <pre>
+K = lqr(A, B, Q, R);
+        </pre>
+
+        <p>
+            The control law is then defined as:
+        </p>
+        <div class="equation">
+            <p>\[
+            u = -Kx
+            \]</p>
+        </div>
+
+        <p>
+            By applying this control law, the system's performance is optimized according to the specified cost function, achieving a balance between minimizing state errors and control effort.
+        </p>
+    </div>
+
+    <div class="content">
+        <h1>Adding Precompensation</h1>
+
+        <p>
+            In the previous section, we designed a state-feedback controller using the Linear Quadratic Regulator (LQR) method. However, this controller does not account for steady-state errors in response to constant reference inputs. To eliminate steady-state error, we can introduce a precompensator gain, often denoted as \( N \), which scales the reference input appropriately.
+        </p>
+
+        <p>
+            The precompensator gain \( N \) is calculated to ensure that the closed-loop system accurately tracks the reference input \( r \) without steady-state error. The control law with precompensation is given by:
+        </p>
+        <div class="equation">
+            <p>\[
+            u = -Kx + Nr
+            \]</p>
+        </div>
+
+        <p>
+            To determine \( N \), we consider the steady-state behavior of the system. At steady state, the derivative of the state vector \( x \) is zero (\( \dot{x} = 0 \)), leading to:
+        </p>
+        <div class="equation">
+            <p>\[
+            0 = Ax_{ss} + Bu_{ss}
+            \]</p>
+        </div>
+
+        <p>
+            Substituting the control law into this equation, we get:
+        </p>
+        <div class="equation">
+            <p>\[
+            0 = A x_{ss} + B(-K x_{ss} + Nr)
+            \]</p>
+        </div>
+
+        <p>
+            Solving for \( x_{ss} \), we have:
+        </p>
+        <div class="equation">
+            <p>\[
+            x_{ss} = (A - BK)^{-1} B Nr
+            \]</p>
+        </div>
+
+        <p>
+            The output at steady state is:
+        </p>
+        <div class="equation">
+            <p>\[
+            y_{ss} = C x_{ss}
+            \]</p>
+        </div>
+
+        <p>
+            To ensure that the output \( y \) matches the reference input \( r \) at steady state, we set \( y_{ss} = r \), leading to:
+        </p>
+        <div class="equation">
+            <p>\[
+            r = C (A - BK)^{-1} B Nr
+            \]</p>
+        </div>
+
+        <p>
+            Solving for \( N \), we obtain:
+        </p>
+        <div class="equation">
+            <p>\[
+            N = \left[ C (A - BK)^{-1} B \right]^{-1}
+            \]</p>
+        </div>
+
+        <p>
+            In MATLAB, the precompensator gain \( N \) can be computed as follows:
+        </p>
+        <pre>
+N = inv(C * inv(A - B * K) * B);
+        </pre>
+
+        <p>
+            By incorporating this precompensator gain into the control law, the closed-loop system will have zero steady-state error in response to constant reference inputs.
+        </p>
+    </div>
+
 
 
 {% endblock %}

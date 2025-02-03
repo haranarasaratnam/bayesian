@@ -1,0 +1,16 @@
+*.sh
+.idea
+*.pyc
+drawio_images
+_playground
+_sandbox
+*.txt
+*.zip
+*.pyi
+*.bat
+*.gz
+*.json
+*.csv
+*.log
+build
+dist

@@ -2,5 +2,115 @@
 
 {% block content %}
 
+    <div class="content">
+        <h1>Inverted Pendulum: State-Space Methods for Controller Design</h1>
+
+        <h2>Overview</h2>
+        <p>
+            From the main problem, the dynamic equations of the inverted pendulum system in state-space form are the following:
+        </p>
+        <div class="equation">
+            <p>\[
+            \begin{bmatrix}
+            \dot{x} \\
+            \ddot{x} \\
+            \dot{\phi} \\
+            \ddot{\phi}
+            \end{bmatrix}
+            =
+            \begin{bmatrix}
+            0 & 1 & 0 & 0 \\
+            0 & -0.1818 & 2.6727 & 0 \\
+            0 & 0 & 0 & 1 \\
+            0 & -0.4545 & 31.1818 & 0
+            \end{bmatrix}
+            \begin{bmatrix}
+            x \\
+            \dot{x} \\
+            \phi \\
+            \dot{\phi}
+            \end{bmatrix}
+            +
+            \begin{bmatrix}
+            0 \\
+            1.8182 \\
+            0 \\
+            4.5455
+            \end{bmatrix}
+            u
+            \]</p>
+            <p>\[
+            \mathbf{y} =
+            \begin{bmatrix}
+            1 & 0 & 0 & 0 \\
+            0 & 0 & 1 & 0
+            \end{bmatrix}
+            \begin{bmatrix}
+            x \\
+            \dot{x} \\
+            \phi \\
+            \dot{\phi}
+            \end{bmatrix}
+            \]</p>
+        </div>
+
+        <p>
+            To see how this problem was originally set up and the system equations were derived, consult the Inverted Pendulum: System Modeling page. For this problem, the outputs are the cart's displacement (\(x\) in meters) and the pendulum angle (\(\phi\) in radians) where \(\phi\) represents the deviation of the pendulum's position from equilibrium, that is, \(\theta = \pi + \phi\).
+        </p>
+
+        <h2>Design Criteria</h2>
+        <p>
+            The design criteria for this system for a 0.2-m step in desired cart position \(x\) are as follows:
+        </p>
+        <ul>
+            <li>Settling time for \(x\) and \(\theta\) of less than 5 seconds</li>
+            <li>Rise time for \(x\) of less than 0.5 seconds</li>
+            <li>Pendulum angle \(\theta\) never more than 20 degrees (0.35 radians) from the vertical</li>
+            <li>Steady-state error of less than 2% for \(x\) and \(\theta\)</li>
+        </ul>
+
+        <p>
+            As you may have noticed if you went through some of the other inverted pendulum examples, the design criteria for this example are different. In the other examples, we were attempting to keep the pendulum vertical in response to an impulsive disturbance force applied to the cart. We did not attempt to control the cart's position. In this example, we are attempting to keep the pendulum vertical while controlling the cart's position to move 0.2 meters to the right. A state-space design approach is well suited to the control of multiple outputs as we have here.
+        </p>
+
+        <p>
+            This problem can be solved using full-state feedback. The schematic of this type of control system is shown below where \(K\) is a matrix of control gains. Note that here we feedback all of the system's states, rather than using the system's outputs for feedback.
+        </p>
+
+        <h2>Open-loop Poles</h2>
+        <p>
+            In this problem, \(r\) represents the step command of the cart's position. The 4 states represent the position and velocity of the cart and the angle and angular velocity of the pendulum. The output \(\mathbf{y}\) contains both the position of the cart and the angle of the pendulum. We want to design a controller so that when a step reference is given to the system, the pendulum should be displaced, but eventually return to zero (i.e., vertical) and the cart should move to its new commanded position. To view the system's open-loop response, please refer to the Inverted Pendulum: System Analysis page.
+        </p>
+
+        <p>
+            The first step in designing a full-state feedback controller is to determine the open-loop poles of the system. Enter the following lines of code into an m-file. After execution in the MATLAB command window, the output will list the open-loop poles (eigenvalues of \(A\)) as shown below.
+        </p>
+
+        <pre>
+M = 0.5;
+m = 0.2;
+b = 0.1;
+I = 0.006;
+g = 9.8;
+l = 0.3;
+
+p = I*(M+m)+M*m*l^2; % denominator for the A and B matrices
+
+A = [0      1       0           0;
+     0 -(I+m*l^2)*b/p  (m^2*g*l^2)/p  0;
+     0      0       0           1;
+     0 -(m*l*b)/p  m*g*l*(M+m)/p  0];
+
+B = [     0;
+     (I+m*l^2)/p;
+          0;
+        m*l/p];
+
+C = [1 0 0 0;
+     0
+::contentReference[oaicite:0]{index=0}
+
+
+
 
 {% endblock %}

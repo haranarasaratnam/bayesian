@@ -2,36 +2,222 @@
 
 {% block content %}
 
-    <div class="content">
-        <h1>Section 4.2: Extended Kalman Filter</h1>
-        <p>In this section we consider the extension of Kalman filtering ideas to the case of non-linear system models.</p>
-        <p>We assume that the system can be represented by a nonlinear discrete-time state-space model of the form:</p>
-        <p>\[ x_{k+1} = f(x_k, u_k, k) + w_k \]</p>
-        <p>\[ z_k = h(x_k, k) + v_k \]</p>
-        <p>where \( f(\cdot) \) is a nonlinear state transition function and \( h(\cdot) \) is a nonlinear observation function.</p>
-        <h3>Prediction</h3>
-        <p>Using a first-order Taylor series expansion, the predicted state and covariance are given by:</p>
-        <p>\[ \hat{x}_{k+1|k} = f(\hat{x}_{k|k}, u_k, k) \]</p>
-        <p>\[ P_{k+1|k} = \frac{\partial f}{\partial x} P_{k|k} \frac{\partial f}{\partial x}^T + Q_k \]</p>
-        <h3>Update</h3>
-        <p>The Kalman gain, state update, and covariance update are given by:</p>
-        <p>\[ K_{k+1} = P_{k+1|k} \left(\frac{\partial h}{\partial x}\right)^T S_{k+1}^{-1} \]</p>
-        <p>\[ \hat{x}_{k+1|k+1} = \hat{x}_{k+1|k} + K_{k+1} \left(z_{k+1} - h(\hat{x}_{k+1|k})\right) \]</p>
-        <p>\[ P_{k+1|k+1} = P_{k+1|k} - K_{k+1} S_{k+1} K_{k+1}^T \]</p>
-        <p>where:</p>
-        <p>\[ S_{k+1} = \frac{\partial h}{\partial x} P_{k+1|k} \left(\frac{\partial h}{\partial x}\right)^T + R_{k+1} \]</p>
+<div class="content">
 
-        <h1>Section 4.3: Some General Comments</h1>
-        <ul>
-            <li><strong>The Jacobians:</strong> The Jacobians \( \frac{\partial f}{\partial x} \) and \( \frac{\partial h}{\partial x} \) are functions of both the state and timestep; they are not constant.</li>
-            <li><strong>Stability:</strong> Since we are dealing with perturbation models of the state and observation matrices about the predicted trajectory, it is important that predictions are close enough to the true states; otherwise, the filter will be poorly matched and may diverge.</li>
-            <li><strong>Initialisation:</strong> Unlike in the linear case, special care must be taken when initialising the Extended Kalman Filter.</li>
-            <li><strong>Computational Cost:</strong> The Extended Kalman Filter is computationally more expensive than its linear counterpart, limiting its early adoption in real-time systems. However, modern computing resources make real-time EKF implementations feasible.</li>
-        </ul>
-        <h3>Implementation</h3>
-        <p>Implementation of the EKF shares similarities with the linear Kalman Filter, but errors may arise from using linearised models. Special care must be taken to ensure the validity of noise assumptions.</p>
-        <p>The state covariance matrix is only an approximation to the mean square error and not a true covariance. If \( P_{k+1|k+1} \) becomes erroneous and small, measurements may have little effect on estimation, potentially causing divergence.</p>
+    <h2>Nonlinear Kalman Filters</h2>
+
+    <p>In this section, we consider the extension of the Kalman filter to the case of non-linear system models.</p>
+    <p>Consider a general system that can be represented by a nonlinear discrete-time state-space model of the form:</p>
+
+    <div>\[
+        \begin{align}
+        \mathbf{x}_{k+1} &= \mathbf{f}(\mathbf{x}_k, \mathbf{u}_k) + \mathbf{w}_k \\
+        \mathbf{z}_k &= \mathbf{h}(\mathbf{x}_k) + \mathbf{v}_k
+        \end{align}
+        \]</div>
+
+
+    <p>where
+
+    <ul>
+        <li>\(\mathbf{f}(\cdot)\) is a nonlinear state transition function</li>
+        <li>\(\mathbf{h}(\cdot)\) is a nonlinear observation function</li>
+        <li>\( \mathbf{x}_k \) is the state vector at time step \( k \).</li>
+        <li>\( \mathbf{u}_k \) is the control input.</li>
+        <li>\( \mathbf{y}_k \) is the measurement.</li>
+        <li>\( \mathbf{v}_k \sim \mathcal{N}(0, Q_k) \) represents process noise.</li>
+        <li>\( \mathbf{w}_k \sim \mathcal{N}(0, R_k) \) represents measurement noise.</li>
+    </ul>
+
+    </p>
+
+    <h2>Extended Kalman Filter</h2>
+    <p>
+        The **Extended Kalman Filter (EKF)** is one of the most widely used techniques for nonlinear state estimation.
+        It extends the **Kalman Filter (KF)** by linearizing the nonlinear system equations using a first-order **Taylor
+        series approximation**.
+        The EKF assumes that the system dynamics and measurement models are given by:
+    </p>
+
+    <h2>Linearization using the Jacobian</h2>
+
+    <p>
+        Since the functions \( f(x) \) and \( h(x) \) are nonlinear, they are approximated using their **first-order
+        Taylor expansion** around
+        the current estimate \( \hat{x}_{k-1} \):
+    </p>
+
+    <div class="equation">
+        \[
+        f(x) \approx f(\hat{x}) + F_k (x - \hat{x})
+        \]
     </div>
+
+    <p>
+        where \( F_k \) is the **Jacobian matrix** of \( f(x) \), evaluated at \( \hat{x}_{k-1} \):
+    </p>
+
+    <div class="equation">
+        \[
+        F_k = \left. \frac{\partial f}{\partial x} \right|_{x = \hat{x}_{k-1}}
+        \]
+    </div>
+
+    <p>
+        Similarly, the measurement function is approximated as:
+    </p>
+
+    <div class="equation">
+        \[
+        h(x) \approx h(\hat{x}) + H_k (x - \hat{x})
+        \]
+    </div>
+
+    <p>
+        where \( H_k \) is the **Jacobian matrix** of \( h(x) \), evaluated at \( \hat{x}_k \):
+    </p>
+
+    <div class="equation">
+        \[
+        H_k = \left. \frac{\partial h}{\partial x} \right|_{x = \hat{x}_k}
+        \]
+    </div>
+
+    <h2>EKF Algorithm</h2>
+
+    <h3>(1) Time Update (Prediction Step):</h3>
+
+    <p>
+        The predicted state estimate is obtained by propagating the previous state through the nonlinear system
+        dynamics:
+    </p>
+
+    <div class="equation">
+        \[
+        \hat{x}_{k|k-1} = f(\hat{x}_{k-1}, u_{k-1})
+        \]
+    </div>
+
+    <p>
+        The predicted covariance estimate is given by:
+    </p>
+
+    <div class="equation">
+        \[
+        P_{k|k-1} = F_k P_{k-1} F_k^T + Q_k
+        \]
+    </div>
+
+    <h3>(2) Measurement Update (Correction Step):</h3>
+
+    <p>
+        The measurement residual is computed as:
+    </p>
+
+    <div class="equation">
+        \[
+        y_k - \hat{y}_k = y_k - h(\hat{x}_{k|k-1})
+        \]
+    </div>
+
+    <p>
+        The residual covariance is:
+    </p>
+
+    <div class="equation">
+        \[
+        S_k = H_k P_{k|k-1} H_k^T + R_k
+        \]
+    </div>
+
+    <p>
+        The **Kalman Gain** is computed as:
+    </p>
+
+    <div class="equation">
+        \[
+        K_k = P_{k|k-1} H_k^T S_k^{-1}
+        \]
+    </div>
+
+    <p>
+        The state estimate is updated using the measurement:
+    </p>
+
+    <div class="equation">
+        \[
+        \hat{x}_k = \hat{x}_{k|k-1} + K_k (y_k - \hat{y}_k)
+        \]
+    </div>
+
+    <p>
+        The error covariance is updated as:
+    </p>
+
+    <div class="equation">
+        \[
+        P_k = (I - K_k H_k) P_{k|k-1}
+        \]
+    </div>
+
+    <h2>Advantages and Limitations</h2>
+
+    <h3>Advantages:</h3>
+    <ul>
+        <li>Computationally efficient compared to fully nonlinear filters.</li>
+        <li>Well-suited for **mildly nonlinear** systems.</li>
+        <li>Widely used in applications such as **navigation, robotics, and tracking**.</li>
+    </ul>
+
+    <h3>Limitations:</h3>
+    <ul>
+        <li>Linearization may introduce **significant errors** in highly nonlinear systems.</li>
+        <li>Accuracy depends on how well the **first-order Taylor expansion** approximates the system dynamics.</li>
+        <li>Fails when system nonlinearities are strong.</li>
+    </ul>
+
+    <h2>Conclusion</h2>
+
+    <p>
+        The Extended Kalman Filter (EKF) is a powerful method for nonlinear state estimation, but it has limitations due
+        to linearization.
+        In cases where strong nonlinearities exist, more advanced methods such as the **Unscented Kalman Filter (UKF)**
+        or **Particle Filters (PF)** may provide better results.
+    </p>
+
+    <h3>Prediction</h3>
+    <p>Using a first-order Taylor series expansion, the predicted state and covariance are given by:</p>
+    <p>\[ \hat{x}_{k+1|k} = f(\hat{x}_{k|k}, u_k, k) \]</p>
+    <p>\[ P_{k+1|k} = \frac{\partial f}{\partial x} P_{k|k} \frac{\partial f}{\partial x}^T + Q_k \]</p>
+    <h3>Update</h3>
+    <p>The Kalman gain, state update, and covariance update are given by:</p>
+    <p>\[ K_{k+1} = P_{k+1|k} \left(\frac{\partial h}{\partial x}\right)^T S_{k+1}^{-1} \]</p>
+    <p>\[ \hat{x}_{k+1|k+1} = \hat{x}_{k+1|k} + K_{k+1} \left(z_{k+1} - h(\hat{x}_{k+1|k})\right) \]</p>
+    <p>\[ P_{k+1|k+1} = P_{k+1|k} - K_{k+1} S_{k+1} K_{k+1}^T \]</p>
+    <p>where:</p>
+    <p>\[ S_{k+1} = \frac{\partial h}{\partial x} P_{k+1|k} \left(\frac{\partial h}{\partial x}\right)^T + R_{k+1} \]
+    </p>
+
+    <h1>General Comments</h1>
+    <ul>
+        <li><strong>The Jacobians:</strong> The Jacobians \( \frac{\partial f}{\partial x} \) and \( \frac{\partial
+            h}{\partial x} \) are functions of both the state and timestep; they are not constant.</li>
+        <li><strong>Stability:</strong> Since we are dealing with perturbation models of the state and observation
+            matrices about the predicted trajectory, it is important that predictions are close enough to the true
+            states; otherwise, the filter will be poorly matched and may diverge.</li>
+        <li><strong>Initialisation:</strong> Unlike in the linear case, special care must be taken when initialising the
+            Extended Kalman Filter.</li>
+        <li><strong>Computational Cost:</strong> The Extended Kalman Filter is computationally more expensive than its
+            linear counterpart, limiting its early adoption in real-time systems. However, modern computing resources
+            make real-time EKF implementations feasible.</li>
+    </ul>
+    <h3>Implementation</h3>
+    <p>Implementation of the EKF shares similarities with the linear Kalman Filter, but errors may arise from using
+        linearised models. Special care must be taken to ensure the validity of noise assumptions.</p>
+    <p>The state covariance matrix is only an approximation to the mean square error and not a true covariance. If \(
+        P_{k+1|k+1} \) becomes erroneous and small, measurements may have little effect on estimation, potentially
+        causing divergence.</p>
+</div>
 
 
 {% endblock %}

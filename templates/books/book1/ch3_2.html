@@ -2,6 +2,253 @@
 
 {% block content %}
 
+<h2> Simultaneous Localization and Mapping (SLAM) with SIR Particle Filter</h2>
+
+<img src="{{ url_for('static', filename='images/SLAM.gif') }}"
+ style="width: 80%; height: auto; display: block; margin: 0 auto;">
 
 
+For SLAM, the Gaussian filters may fail for the following reasons:
+<ul>
+
+    <li>
+        Problem: In SLAM, the robot must associate sensor measurements with the correct landmarks. This is known as the data association problem.
+
+Why EKF Fails: The EKF assumes perfect data association. If a measurement is incorrectly associated with a landmark, the EKF's state estimate will be corrupted. The particle filter, on the other hand, can handle multiple hypotheses (e.g., multiple possible associations) and is more robust to data association errors
+
+    </li>
+    <li>
+  Problem: In SLAM, the posterior distribution of the robot's pose and the map can be multimodal (i.e., there can be multiple plausible solutions). For example, the robot might be uncertain about its position due to symmetric environments or ambiguous sensor data.
+
+Why EKF Fails: The EKF approximates the posterior as a single Gaussian distribution, which cannot represent multimodal distributions. The particle filter, however, can represent multiple hypotheses using particles, making it more suitable for such scenarios
+    </li>
+</ul>
+
+<p>
+The belwo code consists of 5 sections:
+
+    <ul>
+        <li> Robot Motion: The robot moves in a 2D environment with linear and angular
+    velocity. The motion model adds Gaussian noise to simulate uncertainty.</li>
+
+<li>Sensor Measurements: The robot measures the range and bearing to landmarks, with added Gaussian noise.</li>
+
+
+<li>Particle Filter:</li>
+    <ul>
+        <li>Prediction: Each particle is moved according to the motion model.</li>
+
+        <li>Update: Particles are weighted based on how well they match the sensor measurements.</li>
+
+        <li>Resampling: Low-weight particles are replaced with high-weight particles to maintain diversity.</li>
+
+      </ul>
+    <li> Map Update: Each particle maintains its own map of landmarks. New landmarks are added when detected.</li>
+
+    <li> Visualization: The true robot pose, landmarks, particles, and maps are plotted at each time step.</li>
+</ul>
+
+</p>
+
+ <pre><code class="language-matlab">
+% MATLAB Code for SLAM using SIR Particle Filter
+% Toy example: Robot moves in a 2D environment with landmarks
+
+clear; clc; close all;
+
+%% Parameters
+num_particles = 100; % Number of particles
+num_landmarks = 5;   % Number of landmarks in the environment
+num_steps = 50;      % Number of time steps
+motion_noise = 0.1;  % Motion noise (standard deviation)
+sensor_noise = 0.2;  % Sensor noise (standard deviation)
+resampling_threshold = 0.5; % Resampling threshold
+
+%% Environment Setup
+% Landmark positions (ground truth)
+landmarks = [-4, 1;
+             8, 1;
+             8, 8;
+             -4, 8;
+             2, 5];
+
+% Robot's true trajectory (ground truth)
+true_pose = zeros(num_steps, 3); % [x, y, theta]
+true_pose(1, :) = [0, 0, 0]; % Initial pose
+
+% Robot's motion (linear and angular velocity)
+v = 0.5; % Linear velocity
+w = 0.1; % Angular velocity
+
+%% Particle Filter Initialization
+particles = repmat(true_pose(1, :), num_particles, 1); % Initialize particles at the starting pose --> 100 X 3
+weights = ones(num_particles, 1) / num_particles; % Uniform weights
+
+% Map initialization (each particle has its own map)
+particle_maps = zeros(num_particles, num_landmarks, 2); % [x, y] for each landmark --> 100 X 5 X 2
+
+
+%% SLAM Loop
+gif_filename = 'SLAM.gif';
+
+for t = 1:num_steps
+    % True robot motion (ground truth)
+    true_pose(t+1, :) = motion_model(true_pose(t, :), v, w, 0); % No noise for ground truth
+
+    % Simulate sensor measurements (range and bearing to landmarks)
+    z = sensor_model(true_pose(t+1, :), landmarks, sensor_noise);
+
+    % Particle filter prediction and update
+    for i = 1:num_particles
+        % Predict: Move each particle according to the motion model
+        particles(i, :) = motion_model(particles(i, :), v, w, motion_noise);
+
+        % Update: Compute importance weight based on sensor measurements
+        weights(i) = measurement_likelihood(particles(i, :), particle_maps(i, :, :), z, sensor_noise);
+    end
+
+    % Normalize weights
+    weights = weights / sum(weights);
+
+    % Resampling (if necessary)
+    if effective_sample_size(weights) < resampling_threshold * num_particles
+        [particles, weights] = resample_particles(particles, weights);
+    end
+
+    % Update particle maps (data association and landmark estimation)
+    for i = 1:num_particles
+        particle_maps(i, :, :) = update_map(particles(i, :), particle_maps(i, :, :), z, sensor_noise);
+    end
+
+    % Visualization
+    plot_slam(true_pose(t+1, :), landmarks, particles, particle_maps, weights);
+    pause(0.1);
+
+
+    % Capture current frame and add to GIF
+    frame = getframe(gcf);
+    img = frame2im(frame);
+    [imind, cm] = rgb2ind(img, 256);
+    if t == 1
+        imwrite(imind, cm, gif_filename, 'gif', 'Loopcount', inf, 'DelayTime', 0.5);
+    else
+        imwrite(imind, cm, gif_filename, 'gif', 'WriteMode', 'append', 'DelayTime', 0.5);
+    end
+
+end
+
+%% Functions
+
+% Motion model: Predict next pose given current pose and control inputs
+function new_pose = motion_model(pose, v, w, noise)
+    dt = 1; % Time step
+    theta = pose(3);
+    new_pose = pose + [v * cos(theta) * dt, v * sin(theta) * dt, w * dt] + noise * randn(1, 3);
+end
+
+% Sensor model: Simulate range and bearing measurements to landmarks
+function z = sensor_model(pose, landmarks, noise)
+    z = [];
+    for i = 1:size(landmarks, 1)
+        dx = landmarks(i, 1) - pose(1);
+        dy = landmarks(i, 2) - pose(2);
+        range = sqrt(dx^2 + dy^2) + noise * randn;
+        bearing = atan2(dy, dx) - pose(3) + noise * randn;
+        z = [z; range, bearing];
+    end
+end
+
+function likelihood = measurement_likelihood(pose, map, z, noise)
+    likelihood = 1;
+    for i = 1:size(z, 1)
+        % Access the landmark position from the map
+        landmark_pos = squeeze(map); % Convert 3D to 2D
+        if all(landmark_pos == 0) % Skip uninitialized landmarks
+            continue;
+        end
+        dx = landmark_pos(i,1) - pose(1);
+        dy = landmark_pos(i, 2) - pose(2);
+        expected_range = sqrt(dx^2 + dy^2);
+        expected_bearing = atan2(dy, dx) - pose(3);
+        % Gaussian likelihood
+        likelihood = likelihood * normpdf(z(i, 1), expected_range, noise) * normpdf(z(i, 2), expected_bearing, noise);
+    end
+end
+
+% Resampling: Systematic resampling
+function [new_particles, new_weights] = resample_particles(particles, weights)
+    num_particles = size(particles, 1);
+    indices = randsample(1:num_particles, num_particles, true, weights);
+    new_particles = particles(indices, :);
+    new_weights = ones(num_particles, 1) / num_particles;
+end
+
+% Effective sample size: Measure of particle diversity
+function ess = effective_sample_size(weights)
+    ess = 1 / sum(weights.^2);
+end
+
+% Update map: Data association and landmark estimation
+function map = update_map(pose, landmarks_map, z, noise)
+    map = squeeze(landmarks_map);  %5x2
+    for i = 1:size(z, 1)
+        if map(i, 1) == 0 % New landmark
+            range = z(i, 1);
+            bearing = z(i, 2) + pose(3); % Adjust bearing by robot's orientation
+            map(i, 1) = pose(1) + range * cos(bearing); % Landmark x-position
+            map(i, 2) = pose(2) + range * sin(bearing); % Landmark y-position
+        else % Update existing landmark
+            % Predict the expected measurement for the existing landmark
+            dx = map(i, 1) - pose(1);
+            dy = map(i, 2) - pose(2);
+            expected_range = sqrt(dx^2 + dy^2);
+            expected_bearing = atan2(dy, dx) - pose(3);
+
+            % Compute the difference between observed and expected measurements
+            range_error = z(i, 1) - expected_range;
+            bearing_error = z(i, 2) - expected_bearing;
+
+            % Update the landmark position using a simple correction step
+            % (This can be replaced with a Kalman filter for better accuracy)
+            map(i, 1) = map(i, 1) + 0.1 * range_error * cos(expected_bearing + pose(3));
+            map(i, 2) = map(i, 2) + 0.1 * range_error * sin(expected_bearing + pose(3));
+        end
+    end
+end
+
+function plot_slam(true_pose, landmarks, particles, particle_maps, weights)
+    clf; hold on;
+
+    % Plot true robot pose
+    h1 = plot(true_pose(1), true_pose(2), 'ro', 'MarkerSize', 10, 'LineWidth', 2, 'DisplayName', 'True Pose');
+
+    % Plot landmarks
+    h2 = plot(landmarks(:, 1), landmarks(:, 2), 'kx', 'MarkerSize', 10, 'LineWidth', 2, 'DisplayName', 'Landmarks');
+
+    % Plot particles
+    h3 = scatter(particles(:, 1), particles(:, 2), 10, weights, 'filled', 'DisplayName', 'Particles');
+
+    % Compute particle filter's estimated position (weighted average)
+    estimated_pose = sum(particles .* weights, 1); % Weighted average of particles
+    h4 = plot(estimated_pose(1), estimated_pose(2), 'bo', 'MarkerSize', 10, 'LineWidth', 2, 'DisplayName', 'Estimated Pose');
+
+    % Plot particle maps
+    for i = 1:size(particle_maps, 1)
+        plot(squeeze(particle_maps(i, :, 1)), squeeze(particle_maps(i, :, 2)), 'b.');
+    end
+
+    % Plot settings
+    axis equal; grid on;
+    xlim([-6, 10]); ylim([-1, 10]);
+    title('SLAM with SIR Particle Filter');
+
+    % Add legend with only the specified handles
+    legend([h1, h2, h3, h4], 'Location', 'best');
+
+    drawnow;
+
+
+end
+</code>
+ </pre>
 {% endblock %}

@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MathJax in <pre> Tag</title>
+    <!-- Include MathJax -->
+    <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <style>
+        /* Optional: Add some styling for better readability */
+        pre {
+            background-color: #f4f4f4;
+            padding: 10px;
+            border-radius: 5px;
+            overflow-x: auto;
+        }
+    </style>
+</head>
+<body>
+    <h1>MathJax in <code>&lt;pre&gt;</code> Tag</h1>
+
+    <pre>
+        Here is an inline equation: \( E = mc^2 \).
+
+        And here is a block equation:
+        \[
+        I = \int_{a}^{b} f(x) \, dx
+        \]
+
+        Another example:
+        \[
+        \sum_{i=1}^{n} i = \frac{n(n+1)}{2}
+        \]
+    </pre>
+
+    <script>
+        // Configure MathJax to process <pre> tags
+        MathJax = {
+            tex: {
+                inlineMath: [['\\(', '\\)']], // Inline math delimiters
+                displayMath: [['\\[', '\\]']], // Block math delimiters
+            },
+            options: {
+                // Tell MathJax to process all elements, including <pre>
+                skipHtmlTags: [], // Override default skip list
+                ignoreHtmlClass: 'no-mathjax', // Optional: Skip elements with this class
+            },
+        };
+
+        // Process <pre> tags after MathJax is loaded
+        window.addEventListener('load', () => {
+            const preElements = document.querySelectorAll('pre');
+            preElements.forEach((pre) => {
+                // Extract the content of the <pre> tag
+                const content = pre.innerHTML;
+                // Replace \( and \) with \( and \) to ensure MathJax processes them
+                const processedContent = content
+                    .replace(/\\\(/g, '\\( ')
+                    .replace(/\\\)/g, ' \\)')
+                    .replace(/\\\[/g, '\\[')
+                    .replace(/\\\]/g, '\\]');
+                // Update the <pre> tag with the processed content
+                pre.innerHTML = processedContent;
+                // Tell MathJax to reprocess the page
+                MathJax.typesetPromise([pre]);
+            });
+        });
+    </script>
+</body>
+</html>
